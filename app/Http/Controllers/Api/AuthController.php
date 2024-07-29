@@ -6,8 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Auth;
-use Hash;
 use Validator;
+use Mail;
+use App\Mail\WelcomeMail;
+use App\Jobs\Sendmail;
+
 
 class AuthController extends Controller
 {
@@ -16,16 +19,23 @@ class AuthController extends Controller
 
         if( $req->username && $req->password)
         {
-            $credentials = ['username' => $req->username,'password' => $req->password];
+            $credentials = ['username' => $req->username,'password' => $req->password, 'active'=>1];
             try{
                 $auth = Auth::attempt($credentials);
-    
-                $token = Auth::user()->createToken('authToken')->plainTextToken;
+                if($auth){
+                    $token = Auth::user()->createToken(name:'authToken',expiresAt:now()->addMinutes(30))->plainTextToken;
                 return response()->json([
                     'access_token' => $token,
                     'token_type' => 'Bearer',
     
                 ]);
+                }
+                else{
+                    return response()->json([
+                        'message' => "Invalid user",
+                    ],500);
+                }
+                
 
             }
             catch (\Exception $e){
@@ -38,7 +48,11 @@ class AuthController extends Controller
             
         }
         else{
-            return response()->json("please fill the username and password");
+            return response()->json([
+                'username' => $req->username,
+                'password' => $req->password,
+                'message' => 'Please fill '
+            ]);
         }
     
     }
@@ -58,20 +72,68 @@ class AuthController extends Controller
                 'message' => 'Please fill all fields and follow the rule'
             ],400);
         }
-        // return response()->json("validate success");
-        $user = User::create([
-            'username' => $req->username,
-            'password' => $req->password,
-            'fullname' => $req->fullname,
-            'email' => $req->email,
-            'active' => 0
-        ]);
+        try{
+            $user = User::create([
+                'username' => $req->username,
+                'password' => $req->password,
+                'fullname' => $req->fullname,
+                'email' => $req->email,
+                'active' => 0
+            ]);
 
-        return response()->json([
-            'message' => 'Register success!',
-        ],201);
+            $this->sendActivateEmail($user);
+            // $mailQueue = new SendMail($user);
+            // dispatch($mailQueue)->delay(now()->addSeconds(10));
+
+            return response()->json([
+                'message' => 'Register success!',
+            ],201);
+        }
+        catch (\Exception $e){
+          
+            return response()->json([
+                'message' => $e->getMessage()
+            ],400);
+        }
+        
+        
+
+      
        
         
        
     }
+
+    public function sendActivateEmail(User $user){
+        $mailQueue = new SendMail($user);
+        dispatch($mailQueue)->delay(now()->addSeconds(10));
+    }
+
+    public function activateUser(Request $req,string $uid){
+        try{
+            $exist = User::find($uid);
+            // return response()->json($exist);
+            if ($exist){
+                $exist->active = 1;
+                return response()->json($exist);
+                $exist->save();
+
+                return response()->json("Activated user: $user->fullname");
+            }
+            else{
+                return response()->json("no user");
+            }
+
+            
+
+        }
+        catch (\Exception $e){
+            return response()->json([
+                'error' => $e->getMessage()
+            ],400);
+        }
+        
+    
+    }
+
 }

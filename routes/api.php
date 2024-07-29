@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\ToDoController;
 
 Route::post("/login", [AuthController::class, 'login']);
 Route::post("/register", [AuthController::class, 'register']);
+Route::get("/activate/{uid}", [AuthController::class, 'activateUser']);
 
 Route::middleware('auth:sanctum')->group( function(){
     Route::get("/", function(){ return response()->json("hello world from api");});

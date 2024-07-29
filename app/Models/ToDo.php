@@ -10,6 +10,14 @@ class ToDo extends Model
     use HasFactory;
 
     protected $table = 'todo';
+
+    protected $fillable = [
+        'task',
+        'taskdescription',
+        'ownerId',
+        'status',
+        'priority',
+    ];
     
 
 
