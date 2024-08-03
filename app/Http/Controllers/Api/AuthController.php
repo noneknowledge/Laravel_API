@@ -17,6 +17,7 @@ class AuthController extends Controller
     //
     public function login(Request $req){
 
+        
         if( $req->username && $req->password)
         {
             $credentials = ['username' => $req->username,'password' => $req->password, 'active'=>1];
@@ -27,13 +28,12 @@ class AuthController extends Controller
                 return response()->json([
                     'access_token' => $token,
                     'token_type' => 'Bearer',
-    
                 ]);
                 }
                 else{
                     return response()->json([
                         'message' => "Invalid user",
-                    ],500);
+                    ],400);
                 }
                 
 
