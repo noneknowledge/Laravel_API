@@ -23,11 +23,21 @@ const isToDo = ref(false)
         <!-- Left side  -->
         <div>
             <RouterLink class="btn btn-lg text-white" to="/">Home</RouterLink>
-            <RouterLink class="btn btn-lg text-white" to="/project">Project management</RouterLink>
-            <RouterLink class="btn btn-lg text-white" to="/new">New</RouterLink>
             <RouterLink class="btn btn-lg text-white" to="/workspace">Dashboard</RouterLink>
         </div>
         <!-- Left side  -->
+        <section class="d-flex">
+            <button
+                class="btn btn-success"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapseSearch"
+            >
+                Search
+            </button>
+            <form class="collapse" id="collapseSearch">
+                <input class="form-control" placeholder="Input user name" />
+            </form>
+        </section>
         <!-- Right side -->
         <div class="d-flex justify-content-between position-relative">
             <RouterLink to="/login" v-show="!token" class="btn btn-lg text-white btn-outline-info">

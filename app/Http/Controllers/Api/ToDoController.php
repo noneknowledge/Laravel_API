@@ -20,10 +20,10 @@ class ToDoController extends Controller
 
     public function store(Request $req){
         $user = $req->user();
+        $data = $req->all();
 
         $rule = [
             'task' => 'required',
-            'description' => 'required | min:6',
         ];
         $validator = Validator::make($req->all(),$rule) ;
 
@@ -37,8 +37,7 @@ class ToDoController extends Controller
 
         $newToDo = ToDo::create([
             'task' =>  $req->task,
-            'taskdescription'=> $req->description,
-            'priority' => $req->priority ? $req->priority : 0 ,
+            'priority' => $req->priority ? $req->priority : 4 ,
             'ownerId' => $user->id,
         ]);
 

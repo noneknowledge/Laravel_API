@@ -8,6 +8,8 @@ import { useToken } from '../stores/'
 const [token, setToken] = useToken()
 const router = useRouter()
 
+setToken(undefined)
+
 const error = ref()
 
 const postLogin = (event) => {

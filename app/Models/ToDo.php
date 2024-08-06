@@ -13,12 +13,12 @@ class ToDo extends Model
 
     protected $fillable = [
         'task',
-        'taskdescription',
         'ownerId',
         'status',
         'priority',
     ];
     
+    public $timestamps = false;
 
 
 }

@@ -8,6 +8,8 @@
     </head>
     <body style="background-color: #b3c8cf">
         <div id="app"></div>
+        <script src= 'https://cdnjs.cloudflare.com/ajax/libs/dragula/3.6.6/dragula.min.js'></script>
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        
     </body>
 </html>
