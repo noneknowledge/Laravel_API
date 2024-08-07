@@ -7,6 +7,7 @@ import EditIcon from '../icons/EditIcon.vue'
 import GearIcon from '../icons/GearIcon.vue'
 import { useToken } from '../stores/'
 import axios from 'axios'
+import { customSort } from '../helper/'
 
 const props = defineProps({
     isClick: Boolean
@@ -16,28 +17,7 @@ const router = useRouter()
 
 const [token, setToken] = useToken()
 
-const allTask = [
-    { id: 1, priority: 1, status: 'completed', task: 'Task 1' },
-    { id: 2, priority: 3, status: 'incomplete', task: 'Task 2' },
-    { id: 3, priority: 2, status: 'incomplete', task: 'Task 3' },
-    { id: 4, priority: 4, status: 'completed', task: 'Task 4' }
-].sort((a, b) => {
-    if (a.status === 'completed' && b.status === 'incomplete') {
-        return 1
-    } else if (b.status === 'completed' && a.status === 'incomplete') {
-        return -1
-    }
-
-    if (a.priority < b.priority) {
-        return -1
-    } else if (a.priority > b.priority) {
-        return 1
-    } else {
-        return 0
-    }
-})
-
-const tasks = ref(allTask)
+const tasks = ref()
 const item = ref()
 const input = ref()
 const editIndex = ref()
@@ -45,12 +25,18 @@ const editInput = ref()
 const dragCont = ref()
 const drake = ref()
 const priorityIndex = ref()
+const isLoading = ref()
+const dot = ref('.')
+let loading
 
 const URL = import.meta.env.VITE_API_URL
 
 const saveChange = (index) => {
-    console.log('save')
-    tasks.value[index].task = editInput.value
+    if (tasks.value[index].task === editInput.value.trim()) {
+    } else {
+        tasks.value[index].task = editInput.value.trim()
+        tasks.value[index].action = 'update'
+    }
 
     editIndex.value = undefined
     editInput.value = undefined
@@ -58,7 +44,7 @@ const saveChange = (index) => {
 
 const addTask = () => {
     if (input.value) {
-        var newTask = { task: input.value }
+        var newTask = { task: input.value.trim() }
         tasks.value.push(newTask)
         axios
             .post(`${URL}/todo`, newTask, {
@@ -80,19 +66,56 @@ const addTask = () => {
 }
 
 const handleCheckbox = (task) => {
-    if (task.status === 'incomplete') {
-        task.status = 'completed'
+    if (task.status === 0) {
+        task.action = 'update'
+        task.status = 1
     } else {
-        task.status = 'incomplete'
+        task.status = 0
+        task.action = 'update'
     }
 }
 
 const changeColor = (index, priority) => {
     tasks.value[index].priority = priority
+    tasks.value[index].action = 'update'
     priorityIndex.value = undefined
 }
 
-const fetchData = () => {}
+const fetchData = () => {
+    axios
+        .get(`${URL}/todo`, { headers: { Authorization: `Bearer ${token.value}` } })
+        .then((res) => {
+            let rawdata = res.data.data
+            customSort(rawdata, 'status', 'priority')
+            let data = rawdata.map((x) => ({ ...x, action: '' }))
+            tasks.value = data
+            setTimeout(() => (isLoading.value = false), 5000)
+        })
+        .catch((err) => {
+            let statusCode = err.response.status
+            console.log(err)
+            if (statusCode === 401) {
+                alert('User session expired')
+            }
+        })
+}
+
+watch(
+    () => isLoading.value,
+    () => {
+        clearInterval(loading)
+        loading = setInterval(() => {
+            if (dot.value.length === 3) {
+                dot.value = ''
+            } else {
+                dot.value = dot.value + '.'
+            }
+        }, 1000)
+        if (!isLoading.value) {
+            clearInterval(loading)
+        }
+    }
+)
 
 watch(
     () => props.isClick,
@@ -100,24 +123,62 @@ watch(
         item.value.click()
         editIndex.value = undefined
         editInput.value = undefined
+        if (props.isClick) {
+            isLoading.value = true
+            fetchData()
+        }
     }
 )
 
 const saveToDb = () => {
-    console.log(dragCont.value)
+    let preventCall = true
+    console.log(tasks.value)
+    tasks.value.map((task) => {
+        if (task.action) {
+            preventCall = false
+        }
+    })
+
+    if (preventCall) {
+        console.log('no call api')
+        return
+    }
+    tasks.value.map((item, index) => {
+        if (item.action === 'update') {
+            setTimeout(() => {
+                tasks.value[index].action = ''
+            }, 1000)
+        }
+        if (item.action === 'delete') {
+            console.log('delete here ' + index)
+            setTimeout(() => {
+                tasks.value.splice(index, 1)
+            }, 1000)
+        }
+    })
+    axios
+        .put(`${URL}/todo`, tasks.value, {
+            headers: { Authorization: `Bearer ${token.value}` }
+        })
+        .then((res) => {
+            console.log(res)
+        })
+        .catch((err) => {
+            // let statusCode = err.response.status
+            console.log(err)
+            // if (statusCode === 401) {
+            //     alert('User session expired')
+            // }
+        })
 }
 
 const replace = (newTask) => {
-    console.log('before')
-    console.log(tasks.value)
     tasks.value.map((each, index) => {
         if (!each.id) {
             tasks.value[index] = newTask
             return
         }
     })
-    console.log('after')
-    console.log(tasks.value)
 }
 
 onMounted(() => {
@@ -142,125 +203,146 @@ onMounted(() => {
             <div class="bg-white rounded p-3 notebook">
                 <section class="pb-2 d-flex justify-content-between">
                     <QuestionIcon />
-                    <button @click="saveToDb" class="btn btn-success">Save</button>
+                    <button v-if="isLoading" class="btn btn-primary text-white">
+                        Loading {{ dot }}
+                    </button>
+                    <button v-else @click="saveToDb" class="btn btn-success">Save</button>
                     <CloseIcon @closeToDo="item.click()" />
                 </section>
                 <div ref="dragCont">
                     <div class="rounded" v-for="(task, index) in tasks" :key="index">
-                        <div v-if="task.id">
-                            <div
-                                :class="[priorityIndex !== index ? '' : 'd-none']"
-                                :title="task.task"
-                                class="task-class rounded p-3 d-flex justify-content-between align-items-center gap-3"
-                            >
-                                <input
-                                    type="checkbox"
-                                    :checked="task.status === 'completed'"
-                                    @click="handleCheckbox(task)"
-                                    style="zoom: 1.5"
-                                />
-                                <s v-if="task.status === 'completed'"
-                                    ><span
-                                        :class="[editIndex === index ? 'd-none' : '']"
-                                        class="d-block text-truncate"
-                                        style="zoom: 1.2; max-width: 25vh"
-                                    >
-                                        {{ task.task }}
-                                    </span>
-                                    <input
-                                        @keyup.enter="saveChange(index)"
-                                        v-model="editInput"
-                                        :class="[editIndex === index ? '' : 'd-none']"
-                                        type="text"
-                                        class="form-control"
-                                    />
-                                </s>
-                                <span
-                                    :class="[
-                                        task.priority === 4
-                                            ? ''
-                                            : task.priority === 3
-                                              ? 'text-success'
-                                              : task.priority === 2
-                                                ? 'text-warning'
-                                                : 'text-danger'
-                                    ]"
-                                    v-else
-                                    style="zoom: 1.5"
+                        <div v-if="task.action !== 'delete'">
+                            <div v-if="task.id">
+                                <div
+                                    :class="[priorityIndex !== index ? '' : 'd-none']"
+                                    :title="task.task"
+                                    class="task-class rounded p-3 d-flex justify-content-between align-items-center gap-3"
                                 >
-                                    <span
-                                        :class="[editIndex === index ? 'd-none' : '']"
-                                        class="d-block text-truncate"
-                                        style="max-width: 20vh"
-                                    >
-                                        {{ task.task }}
-                                    </span>
                                     <input
-                                        @keyup.enter="saveChange(index)"
-                                        v-model="editInput"
-                                        :class="[editIndex === index ? '' : 'd-none']"
-                                        type="text"
-                                        class="form-control"
+                                        type="checkbox"
+                                        :checked="task.status === 1"
+                                        @click="handleCheckbox(task)"
+                                        style="zoom: 1.5"
                                     />
-                                </span>
-                                <div>
-                                    <button
-                                        v-if="editIndex === index"
-                                        @click="saveChange(index)"
-                                        class="btn btn-outline-success"
-                                    >
-                                        Save
-                                    </button>
-                                    <span v-else>
-                                        <EditIcon
-                                            @click="
-                                                () => {
-                                                    editIndex = index
-                                                    editInput = task.task
-                                                }
-                                            "
-                                            class="hide"
+                                    <s v-if="task.status === 1"
+                                        ><span
+                                            :class="[editIndex === index ? 'd-none' : '']"
+                                            class="d-block text-truncate"
+                                            style="zoom: 1.2; max-width: 25vh"
+                                        >
+                                            {{ task.task }}
+                                        </span>
+                                        <input
+                                            @keyup.enter="saveChange(index)"
+                                            v-model="editInput"
+                                            :class="[editIndex === index ? '' : 'd-none']"
+                                            type="text"
+                                            class="form-control"
                                         />
-                                        &nbsp;
-                                        <GearIcon @click="priorityIndex = index" class="hide" />
+                                    </s>
+                                    <span
+                                        :class="[
+                                            task.priority === 4
+                                                ? ''
+                                                : task.priority === 3
+                                                  ? 'text-success'
+                                                  : task.priority === 2
+                                                    ? 'text-warning'
+                                                    : 'text-danger'
+                                        ]"
+                                        v-else
+                                        style="zoom: 1.5"
+                                    >
+                                        <span
+                                            :class="[editIndex === index ? 'd-none' : '']"
+                                            class="d-block text-truncate"
+                                            style="max-width: 20vh"
+                                        >
+                                            {{ task.task }}
+                                        </span>
+                                        <input
+                                            @keyup.enter="saveChange(index)"
+                                            v-model="editInput"
+                                            :class="[editIndex === index ? '' : 'd-none']"
+                                            type="text"
+                                            class="form-control"
+                                        />
                                     </span>
+                                    <div>
+                                        <button
+                                            v-if="editIndex === index"
+                                            @click="saveChange(index)"
+                                            class="btn btn-outline-success"
+                                        >
+                                            Save
+                                        </button>
+                                        <span v-else>
+                                            <EditIcon
+                                                @click="
+                                                    () => {
+                                                        editIndex = index
+                                                        editInput = task.task
+                                                    }
+                                                "
+                                                class="hide"
+                                            />
+                                            &nbsp;
+                                            <GearIcon @click="priorityIndex = index" class="hide" />
+                                        </span>
+                                    </div>
+                                </div>
+                                <div
+                                    :class="[priorityIndex === index ? '' : 'd-none']"
+                                    class="task-class rounded p-2 d-flex justify-content-between align-items-center gap-3"
+                                >
+                                    <section class="d-flex gap-2">
+                                        <span
+                                            @click="changeColor(index, 1)"
+                                            class="color-picker cursor-pointer bg-danger text-center"
+                                            >1</span
+                                        >
+                                        <span class="vr"></span>
+                                        <span
+                                            @click="changeColor(index, 2)"
+                                            class="color-picker cursor-pointer bg-warning text-center"
+                                            >2</span
+                                        >
+                                        <span class="vr"></span>
+                                        <span
+                                            @click="changeColor(index, 3)"
+                                            class="color-picker cursor-pointer bg-success text-center"
+                                            >3</span
+                                        >
+                                        <span class="vr"></span>
+                                        <span
+                                            @click="changeColor(index, 4)"
+                                            class="color-picker cursor-pointer bg-secondary text-center"
+                                            >4</span
+                                        >
+                                    </section>
+                                    <span class="vr"></span>
+                                    <button
+                                        @click="
+                                            () => {
+                                                tasks[index].action = 'delete'
+                                                priorityIndex = undefined
+                                            }
+                                        "
+                                        class="btn btn-sm btn-secondary"
+                                    >
+                                        Delete
+                                    </button>
+                                    <button
+                                        @click="priorityIndex = undefined"
+                                        class="btn btn-sm btn-danger"
+                                    >
+                                        Cancel
+                                    </button>
                                 </div>
                             </div>
-                            <div
-                                :class="[priorityIndex === index ? '' : 'd-none']"
-                                class="task-class rounded p-2 d-flex justify-content-between align-items-center gap-3"
-                            >
-                                <section class="d-flex gap-3">
-                                    <span
-                                        @click="changeColor(index, 1)"
-                                        class="color-picker bg-danger text-center"
-                                        >1</span
-                                    >
-                                    <span class="vr"></span>
-                                    <span
-                                        @click="changeColor(index, 2)"
-                                        class="color-picker bg-warning text-center"
-                                        >2</span
-                                    >
-                                    <span class="vr"></span>
-                                    <span
-                                        @click="changeColor(index, 3)"
-                                        class="color-picker bg-success text-center"
-                                        >3</span
-                                    >
-                                    <span class="vr"></span>
-                                    <span
-                                        @click="changeColor(index, 4)"
-                                        class="color-picker bg-secondary text-center"
-                                        >4</span
-                                    >
-                                </section>
-                                <button class="btn btn-sm btn-danger">Cancel</button>
-                            </div>
+                            <div v-if="!task.id" class="h2 text-center">{{ task.task }}</div>
+                            <hr />
                         </div>
-                        <div v-if="!task.id" class="h2 text-center">{{ task.task }}</div>
-
-                        <hr />
                     </div>
                 </div>
                 <form @submit.prevent="addTask" class="d-flex gap-3">
@@ -297,30 +379,5 @@ onMounted(() => {
 .color-picker {
     width: 5vh;
     color: white;
-}
-
-.gu-hide {
-    display: none !important;
-}
-
-.gu-unselectable {
-    -webkit-user-select: none !important;
-    -moz-user-select: none !important;
-    -ms-user-select: none !important;
-    user-select: none !important;
-}
-
-.gu-transit {
-    opacity: 0.2;
-    -ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=20)';
-    filter: alpha(opacity=20);
-}
-.gu-mirror {
-    position: fixed !important;
-    margin: 0 !important;
-    z-index: 9999 !important;
-    opacity: 0.8;
-    -ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=80)';
-    filter: alpha(opacity=80);
 }
 </style>

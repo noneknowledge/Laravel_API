@@ -24,7 +24,7 @@ class AuthController extends Controller
             try{
                 $auth = Auth::attempt($credentials);
                 if($auth){
-                    $token = Auth::user()->createToken(name:'authToken',expiresAt:now()->addMinutes(30))->plainTextToken;
+                    $token = Auth::user()->createToken(name:'authToken',expiresAt:now()->addMinutes(60))->plainTextToken;
                 return response()->json([
                     'access_token' => $token,
                     'token_type' => 'Bearer',

@@ -15,7 +15,8 @@ class ToDoController extends Controller
     public function index(Request $req){
 
         $user = $req->user();
-        return ToDoResource::collection(ToDo::all());
+        $todos = ToDo::where('ownerId',2)->get();
+        return ToDoResource::collection($todos);
     }
 
     public function store(Request $req){
@@ -51,8 +52,32 @@ class ToDoController extends Controller
         return new ToDoResource(ToDo::find($todoid));
     }
 
-    public function update(Request $req,$todoid){
-        return response()->json("update");
+    public function update(Request $req){
+
+        $var = 0;
+        $data = $req->all();
+        foreach($data as $task){
+            if($task['action']){
+                $item = ToDo::find($task['id']);
+                if($task['action'] === 'update'){
+                   
+                    $item->task = $task['task'];
+                    $item->status = $task['status'];
+                    $item->priority = $task['priority'];
+                    $item->save();
+                  
+                }
+                else{
+
+                    ToDO::destroy($id);
+                   
+                    return response()->json($item);
+                }
+                
+            }
+        }
+
+        return response()->json($var);
 
     }
 }

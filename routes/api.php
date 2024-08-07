@@ -18,7 +18,8 @@ Route::get("/activate/{uid}", [AuthController::class, 'activateUser']);
 Route::middleware('auth:sanctum')->group( function(){
     Route::get("/", function(){ return response()->json("hello world from api");});
     Route::apiResource('/user', UserController::Class)->except(['destroy']);
-    Route::apiResource('/todo', ToDoController::Class);
+    Route::put("/todo",[ToDoController::class,'update']);
+    Route::apiResource('/todo', ToDoController::Class)->except(['destroy','update']);
     
 }
 );

@@ -6,7 +6,7 @@
         width="26"
         height="26"
         fill="currentColor"
-        class="bi bi-question-circle-fill text-info rounded-circle"
+        class="bi bi-question-circle-fill text-info rounded-circle cursor-pointer"
         viewBox="0 0 16 16"
         style="border: 2px solid black"
     >
