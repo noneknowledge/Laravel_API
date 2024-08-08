@@ -93,10 +93,10 @@ const fetchData = () => {
         })
         .catch((err) => {
             let statusCode = err.response.status
-            console.log(err)
-            if (statusCode === 401) {
-                alert('User session expired')
-            }
+            console.warn(err)
+            // if (statusCode === 401) {
+            //     alert('User session expired')
+            // }
         })
 }
 
@@ -193,8 +193,8 @@ onMounted(() => {
             ref="item"
             class="btn btn-primary"
             type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#collapseExample"
+            data-toggle="collapse"
+            data-target="#collapseExample"
         >
             Button with data-bs-target
         </button>

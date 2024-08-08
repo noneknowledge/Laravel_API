@@ -1,13 +1,13 @@
 <script setup>
 import MoveIcon from '../icons/MoveIcon.vue'
-const props = defineProps({})
+const props = defineProps({ task: undefined })
 </script>
 
 <template>
     <div class="card" style="width: 18rem">
         <div class="card-body position-relative">
-            <h5 class="card-title cursor-pointer">Card title</h5>
-            <h6 class="card-subtitle mb-2 text-muted cursor-pointer">Assign member</h6>
+            <h5 class="card-title cursor-pointer">{{ task.task }}</h5>
+            <h6 class="card-subtitle mb-2 text-muted cursor-pointer">{{ task.tag }}</h6>
             <button class="btn btn-secondary drag-handle text-white"><MoveIcon /></button>
         </div>
     </div>

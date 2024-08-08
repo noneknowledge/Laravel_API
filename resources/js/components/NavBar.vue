@@ -27,11 +27,7 @@ const isToDo = ref(false)
         </div>
         <!-- Left side  -->
         <section class="d-flex">
-            <button
-                class="btn btn-success"
-                data-bs-toggle="collapse"
-                data-bs-target="#collapseSearch"
-            >
+            <button class="btn btn-success" data-toggle="collapse" data-target="#collapseSearch">
                 Search
             </button>
             <form class="collapse" id="collapseSearch">
