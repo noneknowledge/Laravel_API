@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ToDoController;
+use App\Http\Controllers\Api\ProjectController;
+
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -20,6 +22,7 @@ Route::middleware('auth:sanctum')->group( function(){
     Route::apiResource('/user', UserController::Class)->except(['destroy']);
     Route::put("/todo",[ToDoController::class,'update']);
     Route::apiResource('/todo', ToDoController::Class)->except(['destroy','update']);
+    Route::apiResource('/project', ProjectController::Class)->except(['destroy','update']);
     
 }
 );

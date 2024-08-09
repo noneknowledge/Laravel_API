@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue'
+import { customDebounce } from '../helper/'
 
 const props = defineProps({ change: Boolean })
 const emits = defineEmits(['clickCheckbox'])
@@ -16,13 +17,23 @@ const handleCheckBox = (value) => {
     emits('clickCheckbox', value)
 }
 
-const customDebounce = (value, ms = 500) => {
-    clearTimeout(interval)
-    if (value)
-        interval = setTimeout(() => {
-            console.log('Prompt search: ' + value)
-        }, ms)
+const handleSearch = (value) => {
+    interval = customDebounce(
+        interval,
+        (cbVar) => {
+            console.log('Prompt search: ' + cbVar)
+        },
+        value
+    )
 }
+
+// const customDebounce = (value, ms = 500) => {
+//     clearTimeout(interval)
+//     if (value)
+//         interval = setTimeout(() => {
+//             console.log('Prompt search: ' + value)
+//         }, ms)
+// }
 
 watch(
     () => props.change,
@@ -53,7 +64,7 @@ watch(
         >
             <input
                 class="form-control"
-                @input="(event) => customDebounce(event.target.value)"
+                @input="(event) => handleSearch(event.target.value)"
                 placeholder="search"
             />
             <form ref="formRef">

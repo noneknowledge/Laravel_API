@@ -15,3 +15,12 @@ export function customSort(array, equalP, greaterP) {
         }
     })
 }
+
+export const customDebounce = (interval, cb, value, ms = 500) => {
+    clearTimeout(interval)
+    if (value)
+        interval = setTimeout(() => {
+            cb(value)
+        }, ms)
+    return interval
+}

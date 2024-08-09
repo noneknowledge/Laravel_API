@@ -15,11 +15,13 @@ const addNewTask = (event) => {
     formData.append('priority', priority.value)
     formData.append('members', selectMember.value)
 
+    //call api here
+
     closeButton.value.click()
     priority.value = undefined
     selectMember.value = []
     const newTask = {
-        title: formData.get('task'),
+        task: formData.get('task'),
         tag: formData.get('tag')
     }
 
