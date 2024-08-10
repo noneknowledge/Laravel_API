@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ProjectResource;
 use Illuminate\Http\Request;
 use App\Models\Project;
 use Validator;
@@ -10,10 +11,15 @@ use Validator;
 class ProjectController extends Controller
 {
     public function index(Request $req){
-        return response()->json("This is get request");
+        $user = $req->user();
+        $data = Project::with('leader:id,fullname')->whereHas('members', function( $query) use ($user){
+            $query->where('userid',$user->id) ;
+        })->get();
+        // return response()->json($data);
+        return ProjectResource::collection($data);
     }
     public function show(Request $req, $id){
-
+        return response()->json("This is get request with id $id");
     }
     public function store(Request $req){
 

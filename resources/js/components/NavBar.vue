@@ -73,7 +73,7 @@ const isToDo = ref(false)
                                 isDropdown = !isDropdown
                             }
                         "
-                        href="/#"
+                        href="#"
                         ><p class="fs-4 text-black text-center"><NoteIcon />To do list</p></a
                     >
                     <hr />

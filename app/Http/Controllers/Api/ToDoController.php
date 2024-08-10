@@ -15,7 +15,7 @@ class ToDoController extends Controller
     public function index(Request $req){
 
         $user = $req->user();
-        $todos = ToDo::where('ownerId',2)->get();
+        $todos = ToDo::where('ownerId',$user->id)->get();
         return ToDoResource::collection($todos);
     }
 

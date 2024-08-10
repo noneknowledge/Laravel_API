@@ -8,6 +8,7 @@ use App\Models\User;
 use Auth;
 use Validator;
 use Mail;
+use DB;
 use App\Mail\WelcomeMail;
 use App\Jobs\Sendmail;
 
@@ -24,7 +25,9 @@ class AuthController extends Controller
             try{
                 $auth = Auth::attempt($credentials);
                 if($auth){
-                    $token = Auth::user()->createToken(name:'authToken',expiresAt:now()->addMinutes(60))->plainTextToken;
+                    $user = Auth::user();
+                    DB::select("CALL delete_old_token($user->id)");
+                    $token = $user->createToken(name:'authToken',expiresAt:now()->addHours(24))->plainTextToken;
                 return response()->json([
                     'access_token' => $token,
                     'token_type' => 'Bearer',

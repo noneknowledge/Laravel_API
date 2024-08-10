@@ -21,7 +21,7 @@ const postLogin = (event) => {
                 data: { access_token }
             } = res
             setToken(access_token)
-            router.push('/dashboard')
+            router.push('/')
         })
         .catch((err) => {
             error.value = err.response.data.message
@@ -33,7 +33,7 @@ watch(
     () => {
         setTimeout(() => {
             error.value = undefined
-        }, 3000)
+        }, 10000)
     }
 )
 </script>

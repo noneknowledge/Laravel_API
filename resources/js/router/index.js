@@ -41,30 +41,15 @@ const router = createRouter({
             component: LoginView
         },
         {
-            path: '/project',
+            path: '/project/:id',
             name: 'project',
             component: ProjectView
         },
-
         {
             path: '/new',
             name: 'new',
             component: NewView
-            // children: [
-            //     {
-            //         path: ':slug',
-            //         component: CockTail
-            //     }
-            // ]
         }
-        // {
-        //   path: '/about',
-        //   name: 'about',
-        //   // route level code-splitting
-        //   // this generates a separate chunk (About.[hash].js) for this route
-        //   // which is lazy-loaded when the route is visited.
-        //   component: () => import('../views/AboutView.vue')
-        // }
     ]
 })
 

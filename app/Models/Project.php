@@ -18,7 +18,14 @@ class Project extends Model
         'leaderId',
     ];
     
-
     public $timestamps = false;
+
+    public function members(){
+        return $this->hasMany(UserProject::class,'projectid');
+    }
+    public function leader(){
+        return $this->belongsTo(User::class,'leaderid','id');
+    }
+
 
 }

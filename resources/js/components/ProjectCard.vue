@@ -4,8 +4,9 @@ const props = defineProps({
     project: undefined
 })
 const router = useRouter()
+
 const goToProject = () => {
-    router.push('/')
+    router.push(`/project/${props.project.id}`)
 }
 </script>
 
@@ -19,9 +20,10 @@ const goToProject = () => {
             alt="Card image cap"
         />
         <div class="card-body">
-            <h5 class="card-title">Project title</h5>
+            <h5 class="card-title">{{ project.title }}</h5>
             <p class="card-text">
-                Project description <br /><i class="text-secondary">Leader:</i> <br />Total member:
+                <i class="text-secondary">Leader: {{ project.leader.fullname }}</i>
+                <br />Total member: {{ project.total }}
             </p>
         </div>
     </div>

@@ -2,6 +2,8 @@
 import ProjectField from '../components/ProjectField.vue'
 import { ref, watch } from 'vue'
 import PopModal from '../components/PopUpModal.vue'
+import { useToken } from '../stores/'
+import { useRoute } from 'vue-router'
 
 const drake = ref(
     dragula({
@@ -35,7 +37,6 @@ const drake = ref(
         }
     })
 )
-
 const dragCont = ref()
 const columnData = ref([
     {
@@ -55,8 +56,22 @@ const columnData = ref([
         ]
     }
 ])
-
+const [token, setToken] = useToken()
 const cloneCol = JSON.parse(JSON.stringify(columnData.value))
+const route = useRoute()
+const URL = import.meta.env.VITE_API_URL + '/project/' + route.params.id
+
+const fetchData = () => {
+    axios
+        .get(URL, { headers: { Authorization: `Bearer ${token.value}` } })
+        .then((res) => console.log(res))
+        .catch((err) => {
+            if (err.message.includes('401')) {
+                alert('User session expired')
+                setToken(undefined)
+            }
+        })
+}
 
 const handleAddTask = (newTask) => {
     columnData.value[0].tasks.push(newTask)
@@ -82,6 +97,8 @@ const logTheArrange = () => {
     console.log('Arrangement')
     console.log(cloneCol)
 }
+
+fetchData()
 </script>
 
 <template>

@@ -52,7 +52,7 @@ const addTask = () => {
             })
             .then((res) => replace(res.data.data))
             .catch((err) => {
-                if (err.response.status === 401) {
+                if (err.message.status === 401) {
                     router.push('/login')
                 } else {
                     console.warn(err)
@@ -89,14 +89,14 @@ const fetchData = () => {
             customSort(rawdata, 'status', 'priority')
             let data = rawdata.map((x) => ({ ...x, action: '' }))
             tasks.value = data
-            setTimeout(() => (isLoading.value = false), 5000)
+            isLoading.value = false
         })
         .catch((err) => {
-            let statusCode = err.response.status
             console.warn(err)
-            // if (statusCode === 401) {
-            //     alert('User session expired')
-            // }
+            if (err.message.includes('401')) {
+                alert('User session expired')
+                setToken(undefined)
+            }
         })
 }
 
@@ -164,11 +164,11 @@ const saveToDb = () => {
             console.log(res)
         })
         .catch((err) => {
-            // let statusCode = err.response.status
             console.log(err)
-            // if (statusCode === 401) {
-            //     alert('User session expired')
-            // }
+            if (err.message.includes('401')) {
+                alert('User session expired')
+                setToken(undefined)
+            }
         })
 }
 
