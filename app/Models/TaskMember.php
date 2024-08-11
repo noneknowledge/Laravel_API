@@ -11,6 +11,12 @@ class TaskMember extends Model
     protected $table="task_member";
     public $timestamps = false;
 
-    
+    public function member(){
+        return $this->belongsTo(User::class,'leaderid','id');
+    }
+
+    public function task(){
+        return $this->belongsTo(Task::class,'taskid','id');
+    }
 
 }

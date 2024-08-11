@@ -3,7 +3,7 @@
 <template>
     <div title="close to do list">
         <svg
-            @click="$emit('closeToDo')"
+            @click="$emit('close')"
             xmlns="http://www.w3.org/2000/svg"
             width="26"
             height="26"

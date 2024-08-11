@@ -10,4 +10,10 @@ class Container extends Model
     use HasFactory;
     protected $table="containers";
     public $timestamps = false;
+    
+    public function tasks(){
+        return $this->hasMany(Task::class,'containerid');
+    }
+    
 }
+

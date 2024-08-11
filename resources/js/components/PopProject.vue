@@ -13,7 +13,6 @@ const handleSubmit = (event) => {
         title: formData.get('title'),
         thumbnail: formData.get('thumbnail')
     }
-    console.log(newProject)
 
     emits('addProject', newProject)
 }

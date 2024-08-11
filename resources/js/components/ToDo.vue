@@ -1,11 +1,10 @@
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, inject } from 'vue'
 import { useRouter } from 'vue-router'
 import QuestionIcon from '../icons/QuestionIcon.vue'
 import CloseIcon from '../icons/CloseIcon.vue'
 import EditIcon from '../icons/EditIcon.vue'
 import GearIcon from '../icons/GearIcon.vue'
-import { useToken } from '../stores/'
 import axios from 'axios'
 import { customSort } from '../helper/'
 
@@ -15,7 +14,7 @@ const props = defineProps({
 
 const router = useRouter()
 
-const [token, setToken] = useToken()
+const [token, setToken] = inject('token')
 
 const tasks = ref()
 const item = ref()
@@ -207,7 +206,7 @@ onMounted(() => {
                         Loading {{ dot }}
                     </button>
                     <button v-else @click="saveToDb" class="btn btn-success">Save</button>
-                    <CloseIcon @closeToDo="item.click()" />
+                    <CloseIcon @close="item.click()" />
                 </section>
                 <div ref="dragCont">
                     <div class="rounded" v-for="(task, index) in tasks" :key="index">

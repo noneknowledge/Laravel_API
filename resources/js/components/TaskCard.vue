@@ -6,9 +6,11 @@ const props = defineProps({ task: undefined })
 <template>
     <div class="card task" style="width: 18rem">
         <div class="card-body position-relative">
-            <h5 class="card-title cursor-pointer">{{ task.task }}</h5>
+            <h5 class="card-title cursor-pointer">{{ task.title }}</h5>
             <h6 class="card-subtitle mb-2 text-muted cursor-pointer">{{ task.tag }}</h6>
-            <button class="btn btn-secondary drag-handle text-white"><MoveIcon /></button>
+            <button v-if="task.id" class="btn btn-secondary drag-handle text-white">
+                <MoveIcon />
+            </button>
         </div>
     </div>
 </template>

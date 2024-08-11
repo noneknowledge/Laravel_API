@@ -6,7 +6,7 @@ const props = defineProps({})
 const emits = defineEmits(['addTask'])
 const closeButton = ref()
 const selectMember = ref([])
-const priority = ref()
+const priority = ref(4)
 const resetBtn = ref()
 const change = ref(false)
 
@@ -20,12 +20,8 @@ const addNewTask = (event) => {
     closeButton.value.click()
     priority.value = undefined
     selectMember.value = []
-    const newTask = {
-        task: formData.get('task'),
-        tag: formData.get('tag')
-    }
 
-    emits('addTask', newTask)
+    emits('addTask', formData)
 }
 
 const handleChildEvent = (value) => {
@@ -98,24 +94,28 @@ const handleChildEvent = (value) => {
                                     <span
                                         @click="priority = 1"
                                         class="color-picker cursor-pointer bg-danger text-center"
+                                        :class="[priority === 1 ? 'choose' : '']"
                                         >1</span
                                     >
                                     <span class="vr"></span>
                                     <span
                                         @click="priority = 2"
                                         class="color-picker cursor-pointer bg-warning text-center"
+                                        :class="[priority === 2 ? 'choose' : '']"
                                         >2</span
                                     >
                                     <span class="vr"></span>
                                     <span
                                         @click="priority = 3"
                                         class="color-picker cursor-pointer bg-success text-center"
+                                        :class="[priority === 3 ? 'choose' : '']"
                                         >3</span
                                     >
                                     <span class="vr"></span>
                                     <span
                                         @click="priority = 4"
                                         class="color-picker cursor-pointer bg-secondary text-center"
+                                        :class="[priority === 4 ? 'choose' : '']"
                                         >4</span
                                     >
                                 </section>
@@ -157,5 +157,9 @@ const handleChildEvent = (value) => {
 .color-picker {
     width: 5vh;
     color: white;
+}
+.choose {
+    border: 4px solid #a5d7e8;
+    border-radius: 10px;
 }
 </style>

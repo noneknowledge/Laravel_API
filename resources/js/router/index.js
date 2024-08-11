@@ -53,7 +53,7 @@ const router = createRouter({
     ]
 })
 
-const authenticateRoute = ['dashboard', 'test']
+const authenticateRoute = ['test', 'workspace', 'project']
 
 router.beforeEach(async (to, from) => {
     if (!token.value && authenticateRoute.includes(to.name)) {

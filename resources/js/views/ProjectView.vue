@@ -1,10 +1,13 @@
 <script setup>
 import ProjectField from '../components/ProjectField.vue'
-import { ref, watch } from 'vue'
+import { ref, inject } from 'vue'
 import PopModal from '../components/PopUpModal.vue'
-import { useToken } from '../stores/'
+import { customCache, clearKey } from '../stores/'
 import { useRoute } from 'vue-router'
+import ProjectTool from '../components/ProjectTool.vue'
+import GearIcon from '../icons/GearIcon.vue'
 
+const route = useRoute()
 const drake = ref(
     dragula({
         moves: function (el, source, handle, sibling) {
@@ -21,67 +24,83 @@ const drake = ref(
             var below = sibling.getAttribute('data-value')
             var parseVal = JSON.parse(below)
             for (let i = 0; i < cloneCol[from].tasks.length; i++) {
-                if (cloneCol[from].tasks[i].task === parseEl.task) {
+                if (cloneCol[from].tasks[i].title === parseEl.title) {
                     cloneCol[from].tasks.splice(i, 1)
                     break
                 }
             }
             for (let i = 0; i < cloneCol[to].tasks.length; i++) {
-                if (cloneCol[to].tasks[i].task === parseVal.task) {
+                if (cloneCol[to].tasks[i].title === parseVal.title) {
                     cloneCol[to].tasks.splice(i, 0, parseEl)
                     break
                 }
             }
         } else {
-            console.log('no below')
+            for (let i = 0; i < cloneCol[from].tasks.length; i++) {
+                if (cloneCol[from].tasks[i].title === parseEl.title) {
+                    cloneCol[from].tasks.splice(i, 1)
+                    break
+                }
+            }
+
+            cloneCol[to].tasks.push(parseEl)
         }
     })
 )
+const tool = ref()
 const dragCont = ref()
-const columnData = ref([
-    {
-        id: 1,
-        col: 'Product Backlog',
-        tasks: [
-            { task: 'task 1', tag: 'tag 1' },
-            { task: 'task 2', tag: 'tag 2' }
-        ]
-    },
-    {
-        id: 2,
-        col: 'Doing',
-        tasks: [
-            { task: 'task 3', tag: 'tag 3' },
-            { task: 'task 4', tag: 'tag 4' }
-        ]
-    }
-])
-const [token, setToken] = useToken()
-const cloneCol = JSON.parse(JSON.stringify(columnData.value))
-const route = useRoute()
+const columnData = ref()
 const URL = import.meta.env.VITE_API_URL + '/project/' + route.params.id
-
-const fetchData = () => {
-    axios
-        .get(URL, { headers: { Authorization: `Bearer ${token.value}` } })
-        .then((res) => console.log(res))
-        .catch((err) => {
-            if (err.message.includes('401')) {
-                alert('User session expired')
-                setToken(undefined)
-            }
-        })
+var cloneCol
+const fetchData = async () => {
+    console.log('fetcher run ')
+    try {
+        const res = await axios.get(URL, { headers: { Authorization: `Bearer ${token.value}` } })
+        return res.data
+    } catch (e) {
+        if (e.message.includes('401')) {
+            alert('Login session expired')
+            setToken(undefined)
+        }
+        console.warn(e)
+        return undefined
+    }
 }
 
-const handleAddTask = (newTask) => {
+const key = `project/${route.params.id} `
+const project = ref()
+const [token, setToken] = inject('token')
+
+customCache(key, fetchData)
+    .then((res) => {
+        project.value = res.project
+        console.log(res)
+        columnData.value = res.data
+        cloneCol = JSON.parse(JSON.stringify(columnData.value))
+    })
+    .catch((err) => console.warn(err))
+
+const handleAddTask = (formData) => {
+    const newTask = {
+        title: formData.get('task'),
+        tag: formData.get('tag')
+    }
+    axios
+        .post(`${import.meta.env.VITE_API_URL}/task`, formData, {
+            headers: { Authorization: `Bearer ${token.value}` }
+        })
+        .then((res) => console.log(res))
+        .catch((err) => console.warn(err))
     columnData.value[0].tasks.push(newTask)
+    cloneCol[0].tasks.push(newTask)
 }
 
 const handleChangeName = (value) => {
     const { id, newName } = value
-    columnData.value.map((row) => {
+    columnData.value.map((row, index) => {
         if (row.id === id) {
-            row.col = newName
+            row.title = newName
+            cloneCol[index].title = newName
         }
     })
 }
@@ -97,17 +116,39 @@ const logTheArrange = () => {
     console.log('Arrangement')
     console.log(cloneCol)
 }
-
-fetchData()
 </script>
 
 <template>
     <button @click="logTheArrange">Log the arrangement</button>
     <div class="bg-img">
         <div class="d-flex justify-content-center align-items-center gap-3">
-            <h1 class="text-white text-shadow shadow text-center p-3">Project</h1>
+            <h1 title="Go to project setting" class="text-white text-shadow shadow text-center p-3">
+                Project: <span v-if="project">{{ project.title }}</span>
+            </h1>
             <PopModal @addTask="handleAddTask" />
             <button class="btn btn-lg btn-primary" @click="addColumn">Add column</button>
+            <button class="btn btn-lg btn-primary">Save</button>
+
+            <button
+                ref="tool"
+                class="btn btn-lg btn-info text-white"
+                type="button"
+                data-toggle="collapse"
+                data-target="#toolBar"
+            >
+                <GearIcon />
+            </button>
+            <ProjectTool @close="tool.click()">
+                <template #taskBtn> <PopModal @addTask="handleAddTask" /> </template>
+                <template #colBtn>
+                    <button class="m-3 btn btn-lg btn-primary" @click="addColumn">
+                        Add column
+                    </button></template
+                >
+                <template #saveBtn>
+                    <button class="m-3 btn btn-lg btn-success">Save</button></template
+                >
+            </ProjectTool>
         </div>
 
         <div class="container overflow-auto" style="transform: rotateX(180deg)">

@@ -10,7 +10,7 @@ const props = defineProps({
 })
 const emits = defineEmits(['editName'])
 
-const input = ref(props.Column.col)
+const input = ref(props.Column.title)
 const editCol = ref()
 const dragCont = ref()
 
@@ -42,7 +42,7 @@ onMounted(() => {
                 placeholder="Edit column name"
             />
             <span v-else class="cursor-pointer" @click="editCol = Column.id" style="color: #c8acd6">
-                {{ Column.col }}</span
+                {{ Column.title }}</span
             >
         </h5>
 

@@ -27,7 +27,7 @@ class AuthController extends Controller
                 if($auth){
                     $user = Auth::user();
                     DB::select("CALL delete_old_token($user->id)");
-                    $token = $user->createToken(name:'authToken',expiresAt:now()->addHours(24))->plainTextToken;
+                    $token = $user->createToken(name:'authToken',expiresAt:now()->addMinutes(120))->plainTextToken;
                 return response()->json([
                     'access_token' => $token,
                     'token_type' => 'Bearer',
