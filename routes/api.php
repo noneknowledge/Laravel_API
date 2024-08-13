@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ToDoController;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\TaskController;
+use App\Http\Controllers\Api\SearchController;
 
 
 // Route::get('/user', function (Request $request) {
@@ -17,6 +18,8 @@ use App\Http\Controllers\Api\TaskController;
 Route::post("/login", [AuthController::class, 'login']);
 Route::post("/register", [AuthController::class, 'register']);
 Route::get("/activate/{uid}", [AuthController::class, 'activateUser']);
+Route::get("/search/{keyword}",[SearchController::class,'searchUser']);
+Route::get("/prompt/{keyword}",[SearchController::class,'searchPrompt']);
 
 Route::middleware('auth:sanctum')->group( function(){
     Route::get("/", function(){ return response()->json("hello world from api");});

@@ -19,8 +19,11 @@ const fetcher = async () => {
         if (e.message.includes('401')) {
             alert('Login session expired')
             setToken(undefined)
+        } else {
+            alert(e.message)
+            console.warn(e)
         }
-        console.warn(e)
+
         return undefined
     }
 }

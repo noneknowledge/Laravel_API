@@ -7,6 +7,8 @@ import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
 import ProjectView from '../views/ProjectView.vue'
 import WorkSpaceView from '../views/WorkSpaceView.vue'
+import SearchView from '../views/SearchView.vue'
+
 import { useToken } from '../stores/'
 
 const [token, setToken] = useToken()
@@ -19,6 +21,11 @@ const router = createRouter({
             path: '/',
             name: 'home',
             component: HomeView
+        },
+        {
+            path: '/search/:keyword',
+            name: 'search',
+            component: SearchView
         },
         {
             path: '/workspace',

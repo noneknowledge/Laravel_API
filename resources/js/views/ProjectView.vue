@@ -106,29 +106,32 @@ const handleChangeName = (value) => {
 }
 
 const addColumn = () => {
-    var allTasks = document.getElementsByClassName('task')
-    console.log(allTasks)
-    var newCol = { id: 3, col: 'New column', tasks: [{ task: 'nothing' }] }
+    var newCol = { id: 3, title: 'New column', tasks: [{ title: 'nothing' }] }
     columnData.value.push(newCol)
 }
 
-const logTheArrange = () => {
-    console.log('Arrangement')
-    console.log(cloneCol)
+const saveOrder = () => {
+    if (JSON.stringify(cloneCol) === JSON.stringify(columnData.value)) {
+        console.log('True')
+        alert('Nothing change')
+    } else {
+        console.log('ref')
+        console.log(JSON.stringify(columnData.value))
+        console.log('normal')
+        console.log(JSON.stringify(cloneCol))
+        console.log(cloneCol)
+    }
 }
 </script>
 
 <template>
-    <button @click="logTheArrange">Log the arrangement</button>
     <div class="bg-img">
         <div class="d-flex justify-content-center align-items-center gap-3">
             <h1 title="Go to project setting" class="text-white text-shadow shadow text-center p-3">
                 Project: <span v-if="project">{{ project.title }}</span>
             </h1>
-            <PopModal @addTask="handleAddTask" />
-            <button class="btn btn-lg btn-primary" @click="addColumn">Add column</button>
-            <button class="btn btn-lg btn-primary">Save</button>
 
+            <button class="m-3 btn btn-lg btn-success" @click="saveOrder">Save</button>
             <button
                 ref="tool"
                 class="btn btn-lg btn-info text-white"
@@ -146,7 +149,9 @@ const logTheArrange = () => {
                     </button></template
                 >
                 <template #saveBtn>
-                    <button class="m-3 btn btn-lg btn-success">Save</button></template
+                    <button class="m-3 btn btn-lg btn-success" @click="saveOrder">
+                        Save
+                    </button></template
                 >
             </ProjectTool>
         </div>

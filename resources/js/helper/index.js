@@ -17,10 +17,12 @@ export function customSort(array, equalP, greaterP) {
 }
 
 export const customDebounce = (interval, cb, value, ms = 500) => {
+    console.log('ms: ' + ms)
     clearTimeout(interval)
-    if (value)
+    if (value) {
         interval = setTimeout(() => {
             cb(value)
         }, ms)
-    return interval
+        return interval
+    }
 }

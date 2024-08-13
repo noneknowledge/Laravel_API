@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, inject } from 'vue'
 import MenuIcon from '../icons/MenuIcon.vue'
 import GearIcon from '../icons/GearIcon.vue'
 import LogInIcon from '../icons/LogInIcon.vue'
@@ -7,14 +7,44 @@ import LogOutIcon from '../icons/LogOutIcon.vue'
 import ProfileIcon from '../icons/ProfileIcon.vue'
 import NotiIcon from '../icons/NotiIcon.vue'
 import NoteIcon from '../icons/NoteIcon.vue'
-import { useToken } from '../stores/'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import ToDo from './ToDo.vue'
+import { customDebounce, customThrottle } from '../helper/'
+import SearchPrompt from '../components/SearchPrompt.vue'
 
-// const isLogin = ref(false)
-const [token, setToken] = useToken()
+const [token, setToken] = inject('token')
 const isDropdown = ref(false)
 const isToDo = ref(false)
+const keyword = ref('')
+const router = useRouter()
+const prompt = ref([])
+let interval
+
+const URL = import.meta.env.VITE_API_URL
+const searchCb = (value) => {
+    axios
+        .get(`${URL}/prompt/${value}`)
+        .then((res) => {
+            var data = res.data.data
+            console.log(res)
+            if (data) {
+                prompt.value = data
+            } else {
+                prompt.value = []
+            }
+        })
+        .catch((e) => {
+            console.log(e)
+        })
+    console.log('hint for: ' + value)
+}
+const searchUser = () => {
+    prompt.value = []
+    router.push(`/search/${keyword.value.trim()}`)
+}
+const inputchange = () => {
+    interval = customDebounce(interval, searchCb, keyword.value.trim(), 200)
+}
 </script>
 
 <template>
@@ -30,8 +60,14 @@ const isToDo = ref(false)
             <button class="btn btn-success" data-toggle="collapse" data-target="#collapseSearch">
                 Search
             </button>
-            <form class="collapse" id="collapseSearch">
-                <input class="form-control" placeholder="Input user name" />
+            <form @submit.prevent="searchUser" class="collapse" id="collapseSearch">
+                <input
+                    @input="inputchange"
+                    v-model="keyword"
+                    class="form-control"
+                    placeholder="Input user name"
+                />
+                <SearchPrompt v-if="prompt.length > 0" :users="prompt" />
             </form>
         </section>
         <!-- Right side -->
