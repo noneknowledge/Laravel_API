@@ -11,11 +11,8 @@ import { customSort } from '../helper/'
 const props = defineProps({
     isClick: Boolean
 })
-
 const router = useRouter()
-
 const [token, setToken] = inject('token')
-
 const tasks = ref()
 const item = ref()
 const input = ref()
@@ -28,7 +25,7 @@ const isLoading = ref()
 const dot = ref('.')
 let loading
 
-const URL = import.meta.env.VITE_API_URL
+const URL = inject('url')
 
 const saveChange = (index) => {
     if (tasks.value[index].task === editInput.value.trim()) {
@@ -47,7 +44,7 @@ const addTask = () => {
         tasks.value.push(newTask)
         axios
             .post(`${URL}/todo`, newTask, {
-                headers: { Authorization: `Bearer ${token.value}` }
+                headers: { Authorization: `Bearer ${token.value.access_token}` }
             })
             .then((res) => replace(res.data.data))
             .catch((err) => {
@@ -82,7 +79,7 @@ const changeColor = (index, priority) => {
 
 const fetchData = () => {
     axios
-        .get(`${URL}/todo`, { headers: { Authorization: `Bearer ${token.value}` } })
+        .get(`${URL}/todo`, { headers: { Authorization: `Bearer ${token.value.access_token}` } })
         .then((res) => {
             let rawdata = res.data.data
             customSort(rawdata, 'status', 'priority')
@@ -157,7 +154,7 @@ const saveToDb = () => {
     })
     axios
         .put(`${URL}/todo`, tasks.value, {
-            headers: { Authorization: `Bearer ${token.value}` }
+            headers: { Authorization: `Bearer ${token.value.access_token}` }
         })
         .then((res) => {
             console.log(res)

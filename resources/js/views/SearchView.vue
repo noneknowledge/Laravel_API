@@ -1,16 +1,17 @@
 <script setup>
 import UserCard from '../components/UserCard.vue'
 import axios from 'axios'
-import { ref } from 'vue'
+import { ref, watch, inject } from 'vue'
 import { useRoute } from 'vue-router'
 
 const users = ref([])
 const route = useRoute()
 const isLoading = ref(true)
-const keyword = route.params.keyword
 
-const URL = import.meta.env.VITE_API_URL
+const URL = inject('url')
 const searchUser = (value) => {
+    users.value = []
+    isLoading.value = true
     axios
         .get(`${URL}/search/${value}`)
         .then((res) => {
@@ -26,7 +27,13 @@ const searchUser = (value) => {
             console.log(e)
         })
 }
-searchUser(keyword)
+searchUser(route.params.keyword)
+watch(
+    () => route.params.keyword,
+    () => {
+        searchUser(route.params.keyword)
+    }
+)
 </script>
 <template>
     <div style="background-color: #b3c8cf; min-height: 90vh">

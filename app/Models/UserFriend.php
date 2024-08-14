@@ -17,4 +17,12 @@ class UserFriend extends Model
         'status2',
     ];
     public $timestamps = false;
+
+    public function user1(){
+        return $this->belongsTo(User::class,'user1id','id');
+    }
+    public function user2(){
+        return $this->belongsTo(User::class,'user2id','id');
+    }
+
 }

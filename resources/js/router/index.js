@@ -1,20 +1,19 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-// import CockTailView from '../views/CockTailView.vue'
 import HomeView from '../views/HomeView.vue'
-import NewView from '../views/NewView.vue'
 import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
 import ProjectView from '../views/ProjectView.vue'
 import WorkSpaceView from '../views/WorkSpaceView.vue'
 import SearchView from '../views/SearchView.vue'
+import ProfileView from '../views/ProfileView.vue'
+import NotFoundView from '../views/NotFoundView.vue'
 
 import { useToken } from '../stores/'
 
 const [token, setToken] = useToken()
 
 const router = createRouter({
-    // history: createWebHistory(import.meta.env.BASE_URL),
     history: createWebHistory(),
     routes: [
         {
@@ -53,9 +52,14 @@ const router = createRouter({
             component: ProjectView
         },
         {
-            path: '/new',
-            name: 'new',
-            component: NewView
+            path: '/profile/:uid',
+            name: 'profile',
+            component: ProfileView
+        },
+        {
+            path: '/:pathMatch(.*)*',
+            name: 'NotFound',
+            component: NotFoundView
         }
     ]
 })

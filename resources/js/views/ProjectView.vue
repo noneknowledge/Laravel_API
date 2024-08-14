@@ -50,12 +50,14 @@ const drake = ref(
 const tool = ref()
 const dragCont = ref()
 const columnData = ref()
-const URL = import.meta.env.VITE_API_URL + '/project/' + route.params.id
+const URL = inject('url') + '/project/' + route.params.id
 var cloneCol
 const fetchData = async () => {
-    console.log('fetcher run ')
     try {
-        const res = await axios.get(URL, { headers: { Authorization: `Bearer ${token.value}` } })
+        console.log(URL)
+        const res = await axios.get(URL, {
+            headers: { Authorization: `Bearer ${token.value.access_token}` }
+        })
         return res.data
     } catch (e) {
         if (e.message.includes('401')) {
@@ -87,7 +89,7 @@ const handleAddTask = (formData) => {
     }
     axios
         .post(`${import.meta.env.VITE_API_URL}/task`, formData, {
-            headers: { Authorization: `Bearer ${token.value}` }
+            headers: { Authorization: `Bearer ${token.value.access_token}` }
         })
         .then((res) => console.log(res))
         .catch((err) => console.warn(err))

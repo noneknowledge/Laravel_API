@@ -20,8 +20,6 @@ class UserController extends Controller
 
     //add friend
     public function store(Request $req){
-
-        
         $user = $req->user();
         $towardId = $req->userid;
         if($user->id === $towardId){
@@ -37,11 +35,7 @@ class UserController extends Controller
                 if($exist->status1 === NULL)
                 {
                     DB::select("CALL DELETE_FRIEND($user->id,$towardId)");
-                    return response()->json([
-                        'msg' => 'Remove db row'
-                    ]);
                 }
-                
                 return response()->json([
                     'msg' => 'Remove friend success'
                 ]);
@@ -63,9 +57,6 @@ class UserController extends Controller
                 if($exist->status2 === NULL)
                 {
                     DB::select("CALL DELETE_FRIEND($user->id,$towardId)");
-                    return response()->json([
-                        'msg' => 'Remove db row'
-                    ]);
                 }
                 return response()->json([
                     'msg' => 'Remove friend success'
@@ -79,23 +70,42 @@ class UserController extends Controller
                 ]);
             }
         }
-      
         $newFriend = UserFriend::create([
             'user1id' => $user->id,
             'user2id' => $towardId,
             'status1' => 'follow'
         ]);
-
-
         return response()->json([
-            'data'=>$newFriend
+            'msg'=> 'Add friend request sent'
         ],201);
     }
 
     //show profile
-    public function show(Request $req, $userid){
-       
-        return new UserResource(User::find($userid));
+    public function show(Request $req, $uid){
+        try{
+            $user = User::find($uid);
+            $userResource = null;
+            if($user){
+                $userResource = new UserResource($user);
+            }
+            $friends = [];
+           array_push($friends,"hello");
+           array_push($friends,"hello");
+            $friend = UserFriend::with('user1')->with('user2')->where('status1','follow')->where('status2','follow')->select('user1id','user2id')->get();
+            
+
+
+            return [
+                'user'=> $userResource,
+                'friends' => $friends,
+                'project' => 'my project'
+            ];
+           
+        }
+        catch(\Exception $error){
+            return response()->json(['message'=>$error->getMessage()],500);
+        }
+        
     }
 
     public function update(Request $req,$userid){

@@ -5,7 +5,7 @@ const props = defineProps({
     user: undefined
 })
 const [token, setToken] = inject('token')
-const URL = import.meta.env.VITE_API_URL
+const URL = inject('url')
 const addFriend = (uid) => {
     axios
         .post(
@@ -13,11 +13,12 @@ const addFriend = (uid) => {
             { userid: uid },
             {
                 headers: {
-                    Authorization: `Bearer ${token.value}`
+                    Authorization: `Bearer ${token.value.access_token}`
                 }
             }
         )
         .then((res) => {
+            console.log(res.data)
             alert(res.data.msg)
         })
         .catch((err) => {
@@ -25,7 +26,7 @@ const addFriend = (uid) => {
                 alert('Token expired, please log in')
                 setToken(undefined)
             } else {
-                console.log(err)
+                alert(err.response.data.msg)
             }
         })
     console.log('add friend: ' + URL + '/user')

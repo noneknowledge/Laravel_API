@@ -20,13 +20,12 @@ const router = useRouter()
 const prompt = ref([])
 let interval
 
-const URL = import.meta.env.VITE_API_URL
+const URL = inject('url')
 const searchCb = (value) => {
     axios
         .get(`${URL}/prompt/${value}`)
         .then((res) => {
             var data = res.data.data
-            console.log(res)
             if (data) {
                 prompt.value = data
             } else {
@@ -36,7 +35,6 @@ const searchCb = (value) => {
         .catch((e) => {
             console.log(e)
         })
-    console.log('hint for: ' + value)
 }
 const searchUser = () => {
     prompt.value = []
@@ -62,6 +60,7 @@ const inputchange = () => {
             </button>
             <form @submit.prevent="searchUser" class="collapse" id="collapseSearch">
                 <input
+                    required
                     @input="inputchange"
                     v-model="keyword"
                     class="form-control"
@@ -93,13 +92,15 @@ const inputchange = () => {
                     v-show="isDropdown"
                     class="text-black bg-white offset border position-absolute rounded p-3"
                 >
-                    <a class="text-decoration-none" href="/#"
-                        ><p class="fs-4 text-black text-center"><ProfileIcon /> Profile</p></a
+                    <RouterLink
+                        v-if="token"
+                        class="text-decoration-none"
+                        :to="'/profile/' + token.userid"
+                        ><p class="fs-4 text-black text-center">
+                            <ProfileIcon /> Profile
+                        </p></RouterLink
                     >
-                    <hr />
-                    <a class="text-decoration-none" href="/#"
-                        ><p class="fs-4 text-black text-center"><GearIcon /> Setting</p></a
-                    >
+
                     <hr />
                     <a
                         class="text-decoration-none"

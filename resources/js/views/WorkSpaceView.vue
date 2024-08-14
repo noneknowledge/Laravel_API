@@ -6,13 +6,14 @@ import { ref, inject } from 'vue'
 import { customCache, clearKey } from '../stores/'
 
 const [token, setToken] = inject('token')
-const URL = import.meta.env.VITE_API_URL + '/project'
+const URL = inject('url') + '/project'
 const cacheClearKey = clearKey
 const key = 'workSpace'
 const fetcher = async () => {
-    console.log('fetcher run')
     try {
-        const res = await axios.get(URL, { headers: { Authorization: `Bearer ${token.value}` } })
+        const res = await axios.get(URL, {
+            headers: { Authorization: `Bearer ${token.value.access_token}` }
+        })
         const data = res.data.data
         return data
     } catch (e) {
@@ -36,7 +37,7 @@ const handleChildProject = (newProject) => {
     axios
         .post(URL, newProject, {
             headers: {
-                Authorization: `Bearer ${token.value}`
+                Authorization: `Bearer ${token.value.access_token}`
             }
         })
         .then((res) => {

@@ -17,10 +17,8 @@ const postLogin = (event) => {
     axios
         .post('http://localhost:8000/api/login', formData)
         .then((res) => {
-            const {
-                data: { access_token }
-            } = res
-            setToken(access_token)
+            const { data } = res
+            setToken(data)
             router.push('/')
         })
         .catch((err) => {
