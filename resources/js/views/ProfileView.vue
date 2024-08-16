@@ -69,7 +69,7 @@ watch(
                                 </div>
                             </div>
                         </div>
-                        <div class="card mb-4 mb-lg-0"><MyFriend /></div>
+                        <div class="card mb-4 mb-lg-0"><MyFriend :friends="data.friends" /></div>
                     </div>
                     <div class="col-lg-8">
                         <div class="card mb-4">

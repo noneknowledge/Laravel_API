@@ -7,6 +7,7 @@ use App\Http\Resources\ProjectResource;
 use Illuminate\Http\Request;
 use App\Models\Project;
 use App\Models\UserProject;
+use App\Models\UserFriend;
 use App\Models\Container;
 use Validator;
 
@@ -74,6 +75,45 @@ class ProjectController extends Controller
             'msg' => "you did it",
             'data' => $data
         ]);
+    }
+
+    public function setting(Request $req,$pid){
+       
+        try{
+            $user = $req->user();
+            $project = Project::findOrFail($pid);  
+            $myFriends = [];
+            $projectMember = [];
+            $friends = UserFriend::with('user1')->with('user2')->where('user2id',$user->id)
+            ->orWhere('user1id',$user->id)->where('status1','follow')->where('status2','follow')->select('user1id','user2id')->get();
+
+            $members = UserProject::with('member')->where('projectid',$pid)->get();
+            foreach($members as $member){
+                array_push($projectMember,$member->member);
+            }
+            foreach($friends as $friend){
+                if($friend->user1id === (int)$user->id){
+                    array_push($myFriends,$friend->user2);
+                }
+                else{
+                    array_push($myFriends,$friend->user1);
+                }
+            }
+
+            return response()->json([
+                'project' => $project,
+                'user' => $user,
+                'members' => $projectMember,
+                'friends' => $myFriends,
+            ]);
+        }
+        catch(\Exception $e){
+            return response()->json([
+                'error' => $e->getMessage(),
+            ],400);
+        }
+        
+        return response()->json("setting project $pid");
     }
    
 }

@@ -11,4 +11,9 @@ class UserProject extends Model
     protected $table="user_project";
     protected $fillable = ['userid', 'projectid','role'];
     public $timestamps = false;
+    
+    public function member(){
+        return $this->belongsto(User::class,'userid');
+    }
+    
 }

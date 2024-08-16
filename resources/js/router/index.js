@@ -7,6 +7,7 @@ import ProjectView from '../views/ProjectView.vue'
 import WorkSpaceView from '../views/WorkSpaceView.vue'
 import SearchView from '../views/SearchView.vue'
 import ProfileView from '../views/ProfileView.vue'
+import SettingView from '../views/SettingView.vue'
 import NotFoundView from '../views/NotFoundView.vue'
 
 import { useToken } from '../stores/'
@@ -55,6 +56,11 @@ const router = createRouter({
             path: '/profile/:uid',
             name: 'profile',
             component: ProfileView
+        },
+        {
+            path: '/setting/:id',
+            name: 'setting',
+            component: SettingView
         },
         {
             path: '/:pathMatch(.*)*',

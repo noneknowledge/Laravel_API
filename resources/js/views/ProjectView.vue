@@ -50,6 +50,7 @@ const drake = ref(
 const tool = ref()
 const dragCont = ref()
 const columnData = ref()
+const [token, setToken] = inject('token')
 const URL = inject('url') + '/project/' + route.params.id
 var cloneCol
 const fetchData = async () => {
@@ -71,7 +72,6 @@ const fetchData = async () => {
 
 const key = `project/${route.params.id} `
 const project = ref()
-const [token, setToken] = inject('token')
 
 customCache(key, fetchData)
     .then((res) => {
@@ -145,14 +145,18 @@ const saveOrder = () => {
             </button>
             <ProjectTool @close="tool.click()">
                 <template #taskBtn> <PopModal @addTask="handleAddTask" /> </template>
+                <template #settingBtn>
+                    <button
+                        @click="$router.push(`/setting/${project.id}`)"
+                        class="btn btn-outline-secondary my-3"
+                        @addTask="handleAddTask"
+                    >
+                        Project Setting
+                    </button>
+                </template>
                 <template #colBtn>
                     <button class="m-3 btn btn-lg btn-primary" @click="addColumn">
                         Add column
-                    </button></template
-                >
-                <template #saveBtn>
-                    <button class="m-3 btn btn-lg btn-success" @click="saveOrder">
-                        Save
                     </button></template
                 >
             </ProjectTool>

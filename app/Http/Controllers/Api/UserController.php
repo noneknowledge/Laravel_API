@@ -88,16 +88,24 @@ class UserController extends Controller
             if($user){
                 $userResource = new UserResource($user);
             }
-            $friends = [];
-           array_push($friends,"hello");
-           array_push($friends,"hello");
-            $friend = UserFriend::with('user1')->with('user2')->where('status1','follow')->where('status2','follow')->select('user1id','user2id')->get();
+            $myFriends = [];
+           
+            $friends = UserFriend::with('user1')->with('user2')->where('user2id',$uid)
+            ->orWhere('user1id',$user->id)->where('status1','follow')->where('status2','follow')->select('user1id','user2id')->get();
+            foreach($friends as $friend){
+                if($friend->user1id === (int)$uid){
+                    array_push($myFriends,$friend->user2);
+                }
+                else{
+                    array_push($myFriends,$friend->user1);
+                }
             
+            }
 
 
             return [
                 'user'=> $userResource,
-                'friends' => $friends,
+                'friends' => $myFriends,
                 'project' => 'my project'
             ];
            
