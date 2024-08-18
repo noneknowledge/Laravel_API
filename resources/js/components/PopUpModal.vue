@@ -2,13 +2,14 @@
 import { ref } from 'vue'
 import AssignSection from './AssignSection.vue'
 
-const props = defineProps({})
+const props = defineProps({ members: undefined })
 const emits = defineEmits(['addTask'])
 const closeButton = ref()
 const selectMember = ref([])
 const priority = ref(4)
 const resetBtn = ref()
 const change = ref(false)
+console.log(props.members)
 
 const addNewTask = (event) => {
     const formData = new FormData(event.currentTarget)
@@ -122,7 +123,11 @@ const handleChildEvent = (value) => {
                             </div>
                             <div class="d-flex gap-4">
                                 <p>Assign to:</p>
-                                <AssignSection :change="change" @clickCheckbox="handleChildEvent" />
+                                <AssignSection
+                                    :members="members"
+                                    :change="change"
+                                    @clickCheckbox="handleChildEvent"
+                                />
                             </div>
                         </div>
                         <div class="modal-footer">

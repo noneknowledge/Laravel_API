@@ -13,7 +13,7 @@ import GearIcon from '../icons/GearIcon.vue'
                 <CloseIcon @close="$emit('close')" />
             </section>
             <div class="text-center d-flex justify-content-around">
-                <slot name="taskBtn"></slot>
+                <slot name="saveBtn"></slot>
                 <slot name="settingBtn"></slot>
                 <slot name="colBtn"></slot>
             </div>

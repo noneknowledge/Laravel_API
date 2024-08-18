@@ -11,7 +11,7 @@ const route = useRoute()
 const key = ref(`/setting/${route.params.id}`)
 const [token, setToken] = inject('token')
 const URL = inject('url') + key.value
-const curTab = ref()
+const curTab = ref('detail')
 const projectSetting = ref()
 const isLoading = ref(true)
 
@@ -56,22 +56,22 @@ watch(
 )
 </script>
 <template>
-    <div>
+    <div
+        style="
+            background-image: url('https://karmaburn.com/files/screenshots/kimi_wa_houkago_insomnia/isaki1101.jpg');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover;
+        "
+    >
         <Transition
             ><section class="position-absolute" v-show="isLoading">
                 Loading...<LoadingSnippet /></section
         ></Transition>
         <div v-if="!isLoading" class="container">
-            <h2 class="text-center">Setting</h2>
+            <h1 class="text-center text-white text-shadow"><i>Setting</i></h1>
 
-            <nav class="ps-4 d-flex gap-5">
-                <h3
-                    @click="curTab = 'member'"
-                    :class="[curTab === 'member' ? 'active-tab' : 'inactive-tab']"
-                    class="rounded-top p-3"
-                >
-                    Member
-                </h3>
+            <nav class="ps-4 ms-1 d-flex gap-5">
                 <h3
                     @click="curTab = 'detail'"
                     :class="[curTab === 'detail' ? 'active-tab' : 'inactive-tab']"
@@ -79,13 +79,28 @@ watch(
                 >
                     Project detail
                 </h3>
+                <h3
+                    @click="curTab = 'member'"
+                    :class="[curTab === 'member' ? 'active-tab' : 'inactive-tab']"
+                    class="rounded-top p-3"
+                >
+                    Member
+                </h3>
             </nav>
 
-            <section class="border rounded" style="min-height: 60vh">
+            <section class="border rounded bg-white" style="min-height: 80vh">
                 <div v-if="projectSetting">
-                    <h2 class="text-center">Main content</h2>
-                    <SettingMember v-if="curTab === 'member'"></SettingMember>
-                    <SettingProject v-if="curTab === 'detail'"></SettingProject>
+                    <SettingMember
+                        v-if="curTab === 'member'"
+                        :userid="projectSetting.user.id"
+                        :members="projectSetting.members"
+                        :myFriends="projectSetting.friends"
+                    ></SettingMember>
+                    <SettingProject
+                        v-if="curTab === 'detail'"
+                        :project="projectSetting.project"
+                        :userid="projectSetting.user.id"
+                    ></SettingProject>
                 </div>
                 <div v-else>Error!</div>
             </section>

@@ -30,6 +30,13 @@ class ProjectController extends Controller
         if ($isMember === null){
             return response()->json("You're not allowed to see this project!");
         }
+        $projectMember = [];
+        $members = UserProject::with('member')->where('projectid',$id)->get();
+        foreach($members as $member){
+            $pushItems  = $member->member;
+            $pushItems->role = $member->role;
+            array_push($projectMember,$pushItems);
+        }
         
         $data = Container::where("projectid",$id)->with("tasks")->get();
 
@@ -37,7 +44,8 @@ class ProjectController extends Controller
         return response()->json([
             'msg' => "Get request $id",
             'data' =>$data,
-            'project' => $isMember
+            'project' => $isMember,
+            'members' => $projectMember
         ]);
     }
     public function store(Request $req){
@@ -81,7 +89,8 @@ class ProjectController extends Controller
        
         try{
             $user = $req->user();
-            $project = Project::findOrFail($pid);  
+            $project = Project::with('leader:id,fullname')->findOrFail($pid);  
+          
             $myFriends = [];
             $projectMember = [];
             $friends = UserFriend::with('user1')->with('user2')->where('user2id',$user->id)
@@ -89,7 +98,9 @@ class ProjectController extends Controller
 
             $members = UserProject::with('member')->where('projectid',$pid)->get();
             foreach($members as $member){
-                array_push($projectMember,$member->member);
+                $pushItems = $member->member;
+                $pushItems->role = $member->role;
+                array_push($projectMember,$pushItems);
             }
             foreach($friends as $friend){
                 if($friend->user1id === (int)$user->id){

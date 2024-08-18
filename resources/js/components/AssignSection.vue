@@ -2,7 +2,7 @@
 import { ref, watch } from 'vue'
 import { customDebounce } from '../helper/'
 
-const props = defineProps({ change: Boolean })
+const props = defineProps({ change: Boolean, members: undefined })
 const emits = defineEmits(['clickCheckbox'])
 
 const assign = ref([])
@@ -26,14 +26,6 @@ const handleSearch = (value) => {
         value
     )
 }
-
-// const customDebounce = (value, ms = 500) => {
-//     clearTimeout(interval)
-//     if (value)
-//         interval = setTimeout(() => {
-//             console.log('Prompt search: ' + value)
-//         }, ms)
-// }
 
 watch(
     () => props.change,
@@ -70,7 +62,7 @@ watch(
             <form ref="formRef">
                 <ul class="p-2">
                     <li
-                        v-for="(user, index) in users"
+                        v-for="(user, index) in members"
                         :key="index"
                         class="py-2 rounded option text-white d-flex gap-3"
                     >
@@ -85,7 +77,7 @@ watch(
                                 class="rounded-circle"
                                 style="width: 30px; height: 30px"
                                 src="https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg?size=338&ext=jpg&ga=GA1.1.2008272138.1722211200&semt=ais_hybrid"
-                            /><span class="px-3 text-capitalize">{{ user }}</span></label
+                            /><span class="px-3 text-capitalize">{{ user.fullname }}</span></label
                         >
                     </li>
                 </ul>

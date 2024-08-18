@@ -29,3 +29,35 @@
     -ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=80)';
     filter: alpha(opacity=80);
 }
+
+.text-glow {
+    text-shadow:
+        1px 1px 2px black,
+        0 0 25px blue,
+        0 0 5px darkblue;
+}
+
+.text-shadow {
+    text-shadow:
+        2px 2px 2px #3700ff,
+        2px 2px 2px #ff0000,
+        0 0 5px rgb(188, 255, 2);
+}
+.font-lg {
+    font-size: 24px;
+}
+
+.blink-effect {
+    animation: blink 2s infinite;
+}
+@keyframes blink {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.1;
+    }
+    100% {
+        opacity: 1;
+    }
+}

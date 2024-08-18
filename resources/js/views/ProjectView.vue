@@ -72,10 +72,13 @@ const fetchData = async () => {
 
 const key = `project/${route.params.id} `
 const project = ref()
+const members = ref()
 
 customCache(key, fetchData)
     .then((res) => {
         project.value = res.project
+        members.value = res.members
+        console.log(members.value)
         console.log(res)
         columnData.value = res.data
         cloneCol = JSON.parse(JSON.stringify(columnData.value))
@@ -132,8 +135,15 @@ const saveOrder = () => {
             <h1 title="Go to project setting" class="text-white text-shadow shadow text-center p-3">
                 Project: <span v-if="project">{{ project.title }}</span>
             </h1>
-
-            <button class="m-3 btn btn-lg btn-success" @click="saveOrder">Save</button>
+            <PopModal
+                v-if="members"
+                :members="members"
+                @addTask="
+                    () => {
+                        handleAddTask()
+                    }
+                "
+            />
             <button
                 ref="tool"
                 class="btn btn-lg btn-info text-white"
@@ -144,7 +154,9 @@ const saveOrder = () => {
                 <GearIcon />
             </button>
             <ProjectTool @close="tool.click()">
-                <template #taskBtn> <PopModal @addTask="handleAddTask" /> </template>
+                <template #saveBtn>
+                    <button class="m-3 btn btn-lg btn-success" @click="saveOrder">Save</button>
+                </template>
                 <template #settingBtn>
                     <button
                         @click="$router.push(`/setting/${project.id}`)"
@@ -155,7 +167,14 @@ const saveOrder = () => {
                     </button>
                 </template>
                 <template #colBtn>
-                    <button class="m-3 btn btn-lg btn-primary" @click="addColumn">
+                    <button
+                        class="m-3 btn btn-lg btn-primary"
+                        @click="
+                            () => {
+                                addColumn()
+                            }
+                        "
+                    >
                         Add column
                     </button></template
                 >
@@ -179,13 +198,9 @@ const saveOrder = () => {
 <style scoped>
 .bg-img {
     height: 100vh;
-
     background-image: url(../../images/bg-project2.webp);
     background-size: cover; /* <------ */
     background-repeat: repeat-y;
     background-position: center center;
-}
-.text-shadow {
-    text-shadow: 2px 2px 2px #ff0000;
 }
 </style>
