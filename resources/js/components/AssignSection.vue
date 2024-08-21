@@ -4,7 +4,7 @@ import { customDebounce } from '../helper/'
 
 const props = defineProps({ change: Boolean, members: undefined })
 const emits = defineEmits(['clickCheckbox'])
-
+const memList = ref(props.members)
 const assign = ref([])
 const isShow = ref(false)
 const keyWord = ref()
@@ -21,7 +21,10 @@ const handleSearch = (value) => {
     interval = customDebounce(
         interval,
         (cbVar) => {
-            console.log('Prompt search: ' + cbVar)
+            console.log(cbVar + ' Length: ' + cbVar.length)
+            memList.value = props.members.filter((member) =>
+                member.fullname.toUpperCase().includes(cbVar.toUpperCase())
+            )
         },
         value
     )
@@ -62,7 +65,7 @@ watch(
             <form ref="formRef">
                 <ul class="p-2">
                     <li
-                        v-for="(user, index) in members"
+                        v-for="(user, index) in memList"
                         :key="index"
                         class="py-2 rounded option text-white d-flex gap-3"
                     >

@@ -18,6 +18,7 @@ const isLoading = ref(true)
 const fetcher = async () => {
     console.log('fetcher! ')
     try {
+        console.log(URL)
         const res = await axios.get(URL, {
             headers: { Authorization: `Bearer ${token.value.access_token}` }
         })
@@ -95,6 +96,7 @@ watch(
                         :userid="projectSetting.user.id"
                         :members="projectSetting.members"
                         :myFriends="projectSetting.friends"
+                        :ProjectId="$route.params.id"
                     ></SettingMember>
                     <SettingProject
                         v-if="curTab === 'detail'"

@@ -55,7 +55,6 @@ const URL = inject('url') + '/project/' + route.params.id
 var cloneCol
 const fetchData = async () => {
     try {
-        console.log(URL)
         const res = await axios.get(URL, {
             headers: { Authorization: `Bearer ${token.value.access_token}` }
         })
@@ -78,8 +77,6 @@ customCache(key, fetchData)
     .then((res) => {
         project.value = res.project
         members.value = res.members
-        console.log(members.value)
-        console.log(res)
         columnData.value = res.data
         cloneCol = JSON.parse(JSON.stringify(columnData.value))
     })
@@ -88,7 +85,7 @@ customCache(key, fetchData)
 const handleAddTask = (formData) => {
     const newTask = {
         title: formData.get('task'),
-        tag: formData.get('tag')
+        tag: 'Loading...'
     }
     axios
         .post(`${import.meta.env.VITE_API_URL}/task`, formData, {
@@ -111,20 +108,16 @@ const handleChangeName = (value) => {
 }
 
 const addColumn = () => {
-    var newCol = { id: 3, title: 'New column', tasks: [{ title: 'nothing' }] }
+    var newCol = { id: 3, title: 'New column', tasks: [] }
+    cloneCol.push(newCol)
     columnData.value.push(newCol)
 }
 
 const saveOrder = () => {
     if (JSON.stringify(cloneCol) === JSON.stringify(columnData.value)) {
-        console.log('True')
         alert('Nothing change')
     } else {
-        console.log('ref')
-        console.log(JSON.stringify(columnData.value))
-        console.log('normal')
-        console.log(JSON.stringify(cloneCol))
-        console.log(cloneCol)
+        alert('Change')
     }
 }
 </script>
@@ -135,15 +128,7 @@ const saveOrder = () => {
             <h1 title="Go to project setting" class="text-white text-shadow shadow text-center p-3">
                 Project: <span v-if="project">{{ project.title }}</span>
             </h1>
-            <PopModal
-                v-if="members"
-                :members="members"
-                @addTask="
-                    () => {
-                        handleAddTask()
-                    }
-                "
-            />
+            <PopModal v-if="members" :members="members" @addTask="handleAddTask" />
             <button
                 ref="tool"
                 class="btn btn-lg btn-info text-white"

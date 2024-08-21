@@ -1,19 +1,48 @@
 <script setup>
 import FlagIcon from '../icons/FlagIcon.vue'
 import AssignSection from './AssignSection.vue'
-import { ref } from 'vue'
+import axios from 'axios'
+import { ref, inject } from 'vue'
+
+const URL = inject('url')
 const props = defineProps({
     myFriends: undefined,
     members: undefined,
-    userid: Number
+    userid: Number,
+    ProjectId: undefined
 })
+const refMember = props.myFriends.filter(
+    (friend) => !props.members.some((member) => member.id === friend.id)
+)
+const canAddMember = ref(refMember)
+console.log('Project id: ' + props.ProjectId)
+const [token, setToken] = inject('token')
 const selectMember = ref([])
 
+const addMember = () => {
+    if (selectMember.value.length === 0) {
+        alert('No action is needed')
+        return
+    }
+    axios
+        .post(
+            `${URL}/addMember/${props.ProjectId}`,
+            { members: selectMember.value },
+            {
+                headers: { Authorization: `Bearer ${token.value.access_token}` }
+            }
+        )
+        .then((res) => console.log(res))
+        .catch((err) => console.warn(err))
+    console.log(URL)
+    console.log(selectMember.value)
+}
+
 const handleSelectMember = (value) => {
-    if (selectMember.value.includes(value)) {
-        selectMember.value = selectMember.value.filter((member) => member !== value)
+    if (selectMember.value.includes(value.id)) {
+        selectMember.value = selectMember.value.filter((member) => member !== value.id)
     } else {
-        selectMember.value.push(value)
+        selectMember.value.push(value.id)
     }
 }
 </script>
@@ -43,11 +72,12 @@ const handleSelectMember = (value) => {
         <section>
             <h2 class="text-center">Add new member</h2>
             <div class="d-flex" :title="selectMember.map((member) => member.fullname)">
-                <button class="m-3 btn btn-outline-success">Confirm</button><br />
+                <button @click="addMember" class="m-3 btn btn-outline-success">Confirm</button
+                ><br />
                 Total new member to add: {{ selectMember.length }}
             </div>
 
-            <AssignSection :members="myFriends" @clickCheckbox="handleSelectMember" />
+            <AssignSection :members="canAddMember" @clickCheckbox="handleSelectMember" />
         </section>
     </div>
 </template>

@@ -23,6 +23,7 @@ Route::get("/prompt/{keyword}",[SearchController::class,'searchPrompt']);
 Route::get("/user/{uid}",[UserController::class,'show']);
 
 Route::middleware('auth:sanctum')->group( function(){
+    Route::post("/addMember/{pid}",[ProjectController::class,'addMember']);
     Route::get("/setting/{pid}",[ProjectController::Class,'setting']);
     Route::get("/", function(){ return response()->json("hello world from api");});
     Route::apiResource('/user', UserController::Class)->except(['destroy','show']);

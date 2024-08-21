@@ -86,37 +86,39 @@ class ProjectController extends Controller
     }
 
     public function setting(Request $req,$pid){
-       
         try{
             $user = $req->user();
-            $project = Project::with('leader:id,fullname')->findOrFail($pid);  
-          
-            $myFriends = [];
-            $projectMember = [];
-            $friends = UserFriend::with('user1')->with('user2')->where('user2id',$user->id)
-            ->orWhere('user1id',$user->id)->where('status1','follow')->where('status2','follow')->select('user1id','user2id')->get();
-
-            $members = UserProject::with('member')->where('projectid',$pid)->get();
-            foreach($members as $member){
-                $pushItems = $member->member;
-                $pushItems->role = $member->role;
-                array_push($projectMember,$pushItems);
-            }
-            foreach($friends as $friend){
-                if($friend->user1id === (int)$user->id){
-                    array_push($myFriends,$friend->user2);
+            if (is_numeric($pid) && (int)$pid == $pid) {
+                $project = Project::with('leader:id,fullname')->findOrFail($pid);  
+                $myFriends = [];
+                $projectMember = [];
+                $friends = UserFriend::with('user1')->with('user2')->where('user2id',$user->id)
+                ->orWhere('user1id',$user->id)->where('status1','follow')->where('status2','follow')->select('user1id','user2id')->get();
+                $members = UserProject::with('member')->where('projectid',$pid)->get();
+                foreach($members as $member){
+                    $pushItems = $member->member;
+                    $pushItems->role = $member->role;
+                    array_push($projectMember,$pushItems);
+                } 
+                foreach($friends as $friend){
+                    if($friend->user1id === (int)$user->id){
+                        array_push($myFriends,$friend->user2);
+                    }
+                    else{
+                        array_push($myFriends,$friend->user1);
+                    }
                 }
-                else{
-                    array_push($myFriends,$friend->user1);
-                }
+                return response()->json([
+                    'project' => $project,
+                    'user' => $user,
+                    'members' => $projectMember,
+                    'friends' => $myFriends,
+                ]);
+            } 
+            else 
+            {
+                throw new Error("project not found");
             }
-
-            return response()->json([
-                'project' => $project,
-                'user' => $user,
-                'members' => $projectMember,
-                'friends' => $myFriends,
-            ]);
         }
         catch(\Exception $e){
             return response()->json([
@@ -125,6 +127,34 @@ class ProjectController extends Controller
         }
         
         return response()->json("setting project $pid");
+    }
+
+    public function addMember(Request $req,$pid){
+        try{
+            $user = $req->user();
+            $isMember = Project::where('id',$pid)->whereHas('members', function($query) use($user){
+                $query->where('userid',$user->id);
+            })->first();
+            if ($isMember === null){
+                return response()->json("You're not allowed to see this project!");
+            }
+            foreach($req->members as $member){
+                UserProject::create([
+                    'userid' => $member,
+                    'role' => 'viewer',
+                    'projectid' => $pid
+                ]);
+            }
+            return response()->json([
+                'msg' => 'Add success',
+                'total'=> count($req->members)
+            ]);
+        }
+        catch (\Exception $e){
+            return response()->json([
+                'msg' => $e->getMessage(),
+            ],400);
+        }
     }
    
 }

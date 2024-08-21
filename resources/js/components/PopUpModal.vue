@@ -9,14 +9,11 @@ const selectMember = ref([])
 const priority = ref(4)
 const resetBtn = ref()
 const change = ref(false)
-console.log(props.members)
 
 const addNewTask = (event) => {
     const formData = new FormData(event.currentTarget)
     formData.append('priority', priority.value)
     formData.append('members', selectMember.value)
-
-    //call api here
 
     closeButton.value.click()
     priority.value = undefined
