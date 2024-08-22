@@ -9,6 +9,8 @@ use App\Http\Controllers\Api\ToDoController;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\SearchController;
+use App\Http\Controllers\Api\ContainerController;
+
 
 
 // Route::get('/user', function (Request $request) {
@@ -30,7 +32,8 @@ Route::middleware('auth:sanctum')->group( function(){
     Route::put("/todo",[ToDoController::class,'update']);
     Route::apiResource('/todo', ToDoController::Class)->except(['destroy','update']);
     Route::apiResource('/project', ProjectController::Class)->except(['destroy','update']);
-    Route::post('/task',[TaskController::class,'store']);
+    Route::post('/task/{pid}',[TaskController::class,'store']);
+    Route::post('/column/{pid}',[ContainerController::class,'store']);
 }
 );
 

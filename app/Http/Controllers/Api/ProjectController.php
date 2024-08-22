@@ -141,7 +141,6 @@ class ProjectController extends Controller
             foreach($req->members as $member){
                 UserProject::create([
                     'userid' => $member,
-                    'role' => 'viewer',
                     'projectid' => $pid
                 ]);
             }

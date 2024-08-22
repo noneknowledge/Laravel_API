@@ -9,6 +9,7 @@ import SearchView from '../views/SearchView.vue'
 import ProfileView from '../views/ProfileView.vue'
 import SettingView from '../views/SettingView.vue'
 import NotFoundView from '../views/NotFoundView.vue'
+import MemberView from '../views/MemberView.vue'
 
 import { useToken } from '../stores/'
 
@@ -56,6 +57,11 @@ const router = createRouter({
             path: '/profile/:uid',
             name: 'profile',
             component: ProfileView
+        },
+        {
+            path: '/modify-member/:id',
+            name: 'editMember',
+            component: MemberView
         },
         {
             path: '/setting/:id',

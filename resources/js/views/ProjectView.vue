@@ -1,10 +1,11 @@
 <script setup>
 import ProjectField from '../components/ProjectField.vue'
-import { ref, inject } from 'vue'
+import { ref, inject, watch } from 'vue'
 import PopModal from '../components/PopUpModal.vue'
 import { customCache, clearKey } from '../stores/'
 import { useRoute } from 'vue-router'
 import ProjectTool from '../components/ProjectTool.vue'
+import LoadingSnippet from '../components/LoadingSnippet.vue'
 import GearIcon from '../icons/GearIcon.vue'
 
 const route = useRoute()
@@ -51,11 +52,13 @@ const tool = ref()
 const dragCont = ref()
 const columnData = ref()
 const [token, setToken] = inject('token')
-const URL = inject('url') + '/project/' + route.params.id
+const id = route.params.id
+const URL = inject('url')
 var cloneCol
 const fetchData = async () => {
     try {
-        const res = await axios.get(URL, {
+        isLoading.value = true
+        const res = await axios.get(`${URL}/project/${id}`, {
             headers: { Authorization: `Bearer ${token.value.access_token}` }
         })
         return res.data
@@ -72,9 +75,12 @@ const fetchData = async () => {
 const key = `project/${route.params.id} `
 const project = ref()
 const members = ref()
+const isLoading = ref(true)
+const canSaveChange = ref(false)
 
 customCache(key, fetchData)
     .then((res) => {
+        isLoading.value = false
         project.value = res.project
         members.value = res.members
         columnData.value = res.data
@@ -87,43 +93,78 @@ const handleAddTask = (formData) => {
         title: formData.get('task'),
         tag: 'Loading...'
     }
-    axios
-        .post(`${import.meta.env.VITE_API_URL}/task`, formData, {
-            headers: { Authorization: `Bearer ${token.value.access_token}` }
-        })
-        .then((res) => console.log(res))
-        .catch((err) => console.warn(err))
     columnData.value[0].tasks.push(newTask)
     cloneCol[0].tasks.push(newTask)
+
+    formData.append('containerid', cloneCol[0].id)
+    axios
+        .post(`${URL}/task/${id}`, formData, {
+            headers: { Authorization: `Bearer ${token.value.access_token}` }
+        })
+        .then((res) => {
+            console.log(res)
+            columnData.value[0].tasks.map((task, index) => {
+                if (!task.id) {
+                    columnData.value[0].tasks[index] = res.data.newTask
+                    return
+                }
+            })
+        })
+        .catch((err) => console.warn(err))
 }
 
 const handleChangeName = (value) => {
     const { id, newName } = value
     columnData.value.map((row, index) => {
         if (row.id === id) {
-            row.title = newName
-            cloneCol[index].title = newName
+            if (row.title === newName) {
+                alert('Same name')
+                return
+            } else {
+                canSaveChange = true
+                row.title = newName
+                cloneCol[index].title = newName
+                return
+            }
         }
     })
 }
 
 const addColumn = () => {
+    isLoading.value = true
     var newCol = { id: 3, title: 'New column', tasks: [] }
-    cloneCol.push(newCol)
-    columnData.value.push(newCol)
+    axios
+        .post(`${URL}/column/${id}`, null, {
+            headers: { Authorization: `Bearer ${token.value.access_token}` }
+        })
+        .then((res) => {
+            cloneCol.push(res.data.newColumn)
+            columnData.value.push(res.data.newColumn)
+            isLoading.value = false
+        })
+        .catch((err) => console.warn(err))
 }
 
 const saveOrder = () => {
-    if (JSON.stringify(cloneCol) === JSON.stringify(columnData.value)) {
-        alert('Nothing change')
+    if (canSaveChange.value) {
+        alert('Can save change')
     } else {
-        alert('Change')
+        alert('Nothing change')
     }
+    // if (JSON.stringify(cloneCol) === JSON.stringify(columnData.value)) {
+    //     alert('Nothing change')
+    // } else {
+    //     alert('Change')
+    // }
 }
 </script>
 
 <template>
     <div class="bg-img">
+        <Transition
+            ><section class="position-absolute" style="z-index: 100" v-show="isLoading">
+                Loading...<LoadingSnippet /></section
+        ></Transition>
         <div class="d-flex justify-content-center align-items-center gap-3">
             <h1 title="Go to project setting" class="text-white text-shadow shadow text-center p-3">
                 Project: <span v-if="project">{{ project.title }}</span>
@@ -146,7 +187,6 @@ const saveOrder = () => {
                     <button
                         @click="$router.push(`/setting/${project.id}`)"
                         class="btn btn-outline-secondary my-3"
-                        @addTask="handleAddTask"
                     >
                         Project Setting
                     </button>
@@ -187,5 +227,14 @@ const saveOrder = () => {
     background-size: cover; /* <------ */
     background-repeat: repeat-y;
     background-position: center center;
+}
+.v-enter-active,
+.v-leave-active {
+    transition: opacity 0.5s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+    opacity: 0;
 }
 </style>

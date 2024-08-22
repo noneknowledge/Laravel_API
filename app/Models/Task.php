@@ -10,4 +10,14 @@ class Task extends Model
     use HasFactory;
     protected $table="tasks";
     public $timestamps = false;
+
+    protected $fillable = [
+        'id',
+        'title',
+        'description',
+        'tag',
+        'priority',
+        'containerid',
+        'arrange'
+    ];
 }

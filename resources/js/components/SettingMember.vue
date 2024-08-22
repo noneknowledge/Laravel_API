@@ -53,7 +53,8 @@ const handleSelectMember = (value) => {
                 <li
                     v-for="(user, index) in members"
                     :key="index"
-                    class="py-2 cursor-pointer rounded option font-lg d-flex align-items-center gap-3"
+                    @click="$router.push(`/profile/${user.id}`)"
+                    class="hover-user p-2 my-2 cursor-pointer rounded option font-lg d-flex align-items-center gap-3"
                 >
                     <FlagIcon v-if="user.role === 'admin'" />
                     <img
@@ -70,14 +71,40 @@ const handleSelectMember = (value) => {
         </section>
         <hr />
         <section>
+            <h2 class="text-center">Edit member role</h2>
+            <div class="text-center">
+                <RouterLink
+                    :to="{ name: 'editMember', params: { id: ProjectId } }"
+                    class="scale btn btn-warning btn-lg"
+                    >Edit Member Role</RouterLink
+                >
+            </div>
+        </section>
+        <hr />
+        <section>
             <h2 class="text-center">Add new member</h2>
-            <div class="d-flex" :title="selectMember.map((member) => member.fullname)">
-                <button @click="addMember" class="m-3 btn btn-outline-success">Confirm</button
+            <div
+                class="d-flex justify-content-center justify-items-center"
+                :title="selectMember.map((member) => member.fullname)"
+            >
+                <button @click="addMember" class="m-3 btn btn-outline-success scale">Confirm</button
                 ><br />
                 Total new member to add: {{ selectMember.length }}
             </div>
-
-            <AssignSection :members="canAddMember" @clickCheckbox="handleSelectMember" />
+            <div class="d-flex align-items-center justify-content-center">
+                <AssignSection :members="canAddMember" @clickCheckbox="handleSelectMember" />
+            </div>
         </section>
     </div>
 </template>
+<style scoped>
+.scale:hover {
+    transform: scale(1.1);
+}
+.hover-user:hover {
+    transform: scale(1.1);
+    background-color: #9de2ff;
+    border: 1px solid black;
+    border-radius: 10px;
+}
+</style>
