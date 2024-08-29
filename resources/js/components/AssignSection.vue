@@ -21,7 +21,6 @@ const handleSearch = (value) => {
     interval = customDebounce(
         interval,
         (cbVar) => {
-            console.log(cbVar + ' Length: ' + cbVar.length)
             memList.value = props.members.filter((member) =>
                 member.fullname.toUpperCase().includes(cbVar.toUpperCase())
             )

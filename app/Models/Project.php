@@ -19,6 +19,7 @@ class Project extends Model
         'leaderId',
     ];
     
+
     public $timestamps = false;
 
     public function members(){
@@ -26,6 +27,17 @@ class Project extends Model
     }
     public function leader(){
         return $this->belongsTo(User::class,'leaderid','id');
+    }
+    public function columns(){
+        return $this->hasMany(Container::class,'projectid');
+    }
+
+      // this is a recommended way to declare event handlers
+      protected static function booted () {
+        static::deleting(function(Project $project) { // before delete() method call this
+            $project->columns()->delete();
+            $project->members()->delete();
+        });
     }
 
 

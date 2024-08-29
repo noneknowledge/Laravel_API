@@ -40,7 +40,6 @@ class ProjectController extends Controller
         
         $data = Container::where("projectid",$id)->with("tasks")->get();
 
-
         return response()->json([
             'msg' => "Get request $id",
             'data' =>$data,
@@ -155,5 +154,32 @@ class ProjectController extends Controller
             ],400);
         }
     }
-   
+
+    public function destroy(Request $req,$pid){
+        try{
+            $user = $req->user();
+            $project = Project::find($pid);
+            if ($project->leaderid === $user->id)
+            {
+                $column = Container::where('projectid',$pid)->first();
+                $column->delete();
+                // $project->delete();
+                return response()->json([
+                    'msg' => 'Deleted',
+                    'project' => $project
+                ]);
+            }
+            else
+            {
+                return response()->json([
+                    'msg' => 'You are not allow to do this'
+                ]);
+            }
+        }
+        catch (\Exception $e){
+            return response()->json([
+                'msg' => $e->getMessage()
+            ],400);
+        }
+    }
 }

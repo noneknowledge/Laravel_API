@@ -18,7 +18,6 @@ const fetchData = (params) => {
     axios
         .get(path)
         .then((res) => {
-            console.log(res.data)
             if (token.value && res.data.user) {
                 if (token.value.userid === res.data.user.id) {
                     canEdit.value = true

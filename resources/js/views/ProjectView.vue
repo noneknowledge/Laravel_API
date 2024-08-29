@@ -89,26 +89,39 @@ customCache(key, fetchData)
     .catch((err) => console.warn(err))
 
 const handleAddTask = (formData) => {
-    const newTask = {
-        title: formData.get('task'),
-        tag: 'Loading...'
+    if (columnData.value.length === 0) {
+        alert('No container to add')
+        return
     }
-    columnData.value[0].tasks.push(newTask)
-    cloneCol[0].tasks.push(newTask)
 
+    isLoading.value = true
+    // const newTask = {
+    //     title: formData.get('task'),
+    //     tag: 'Loading...'
+    // }
+    // columnData.value[0].tasks.push(newTask)
+    // cloneCol[0].tasks.push(newTask)
     formData.append('containerid', cloneCol[0].id)
     axios
         .post(`${URL}/task/${id}`, formData, {
             headers: { Authorization: `Bearer ${token.value.access_token}` }
         })
         .then((res) => {
-            console.log(res)
-            columnData.value[0].tasks.map((task, index) => {
-                if (!task.id) {
-                    columnData.value[0].tasks[index] = res.data.newTask
-                    return
-                }
-            })
+            columnData.value[0].tasks.push(res.data.newTask)
+            cloneCol[0].tasks.push(res.data.newTask)
+            isLoading.value = false
+            // for (let index = 0; index < cloneCol[0].tasks.length; index++) {
+            //     if (!cloneCol[0].tasks[index].id) {
+            //         cloneCol[0].tasks[index] = res.data.newTask
+            //         break
+            //     }
+            // }
+            // for (let index = 0; index < columnData.value[0].tasks.length; index++) {
+            //     if (!columnData.value[0].tasks[index].id) {
+            //         columnData.value[0].tasks[index] = res.data.newTask
+            //         break
+            //     }
+            // }
         })
         .catch((err) => console.warn(err))
 }
@@ -132,14 +145,14 @@ const handleChangeName = (value) => {
 
 const addColumn = () => {
     isLoading.value = true
-    var newCol = { id: 3, title: 'New column', tasks: [] }
     axios
         .post(`${URL}/column/${id}`, null, {
             headers: { Authorization: `Bearer ${token.value.access_token}` }
         })
         .then((res) => {
-            cloneCol.push(res.data.newColumn)
-            columnData.value.push(res.data.newColumn)
+            cloneCol.push({ ...res.data.newColumn, task: [] })
+            columnData.value.push({ ...res.data.newColumn, tasks: [] })
+            console.log(columnData.value)
             isLoading.value = false
         })
         .catch((err) => console.warn(err))
@@ -149,13 +162,12 @@ const saveOrder = () => {
     if (canSaveChange.value) {
         alert('Can save change')
     } else {
-        alert('Nothing change')
+        if (JSON.stringify(cloneCol) === JSON.stringify(columnData.value)) {
+            alert('Nothing change')
+        } else {
+            alert('Change')
+        }
     }
-    // if (JSON.stringify(cloneCol) === JSON.stringify(columnData.value)) {
-    //     alert('Nothing change')
-    // } else {
-    //     alert('Change')
-    // }
 }
 </script>
 

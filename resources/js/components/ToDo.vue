@@ -128,7 +128,6 @@ watch(
 
 const saveToDb = () => {
     let preventCall = true
-    console.log(tasks.value)
     tasks.value.map((task) => {
         if (task.action) {
             preventCall = false
@@ -146,7 +145,6 @@ const saveToDb = () => {
             }, 1000)
         }
         if (item.action === 'delete') {
-            console.log('delete here ' + index)
             setTimeout(() => {
                 tasks.value.splice(index, 1)
             }, 1000)
@@ -160,7 +158,6 @@ const saveToDb = () => {
             console.log(res)
         })
         .catch((err) => {
-            console.log(err)
             if (err.message.includes('401')) {
                 alert('User session expired')
                 setToken(undefined)

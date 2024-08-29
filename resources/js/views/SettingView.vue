@@ -18,7 +18,6 @@ const isLoading = ref(true)
 const fetcher = async () => {
     console.log('fetcher! ')
     try {
-        console.log(URL)
         const res = await axios.get(URL, {
             headers: { Authorization: `Bearer ${token.value.access_token}` }
         })
@@ -36,7 +35,6 @@ const fetcher = async () => {
 customCache(key.value, fetcher)
     .then((res) => {
         isLoading.value = false
-        console.log(res)
         projectSetting.value = res
     })
     .catch((err) => console.warn(err))

@@ -31,7 +31,7 @@ Route::middleware('auth:sanctum')->group( function(){
     Route::apiResource('/user', UserController::Class)->except(['destroy','show']);
     Route::put("/todo",[ToDoController::class,'update']);
     Route::apiResource('/todo', ToDoController::Class)->except(['destroy','update']);
-    Route::apiResource('/project', ProjectController::Class)->except(['destroy','update']);
+    Route::apiResource('/project', ProjectController::Class)->except(['update']);
     Route::post('/task/{pid}',[TaskController::class,'store']);
     Route::post('/column/{pid}',[ContainerController::class,'store']);
 }

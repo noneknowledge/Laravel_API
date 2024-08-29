@@ -18,7 +18,6 @@ const addFriend = (uid) => {
             }
         )
         .then((res) => {
-            console.log(res.data)
             alert(res.data.msg)
         })
         .catch((err) => {
@@ -29,7 +28,6 @@ const addFriend = (uid) => {
                 alert(err.response.data.msg)
             }
         })
-    console.log('add friend: ' + URL + '/user')
 }
 const chat = () => {
     console.log('chat')

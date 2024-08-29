@@ -15,7 +15,6 @@ const refMember = props.myFriends.filter(
     (friend) => !props.members.some((member) => member.id === friend.id)
 )
 const canAddMember = ref(refMember)
-console.log('Project id: ' + props.ProjectId)
 const [token, setToken] = inject('token')
 const selectMember = ref([])
 
@@ -34,8 +33,6 @@ const addMember = () => {
         )
         .then((res) => console.log(res))
         .catch((err) => console.warn(err))
-    console.log(URL)
-    console.log(selectMember.value)
 }
 
 const handleSelectMember = (value) => {

@@ -20,6 +20,13 @@ class Container extends Model
     
     public function tasks(){
         return $this->hasMany(Task::class,'containerid');
+        // return $this->hasMany(Task::class,'containerid')->orderby("arrange");
+    }
+    
+    protected static function booted () {
+        static::deleting(function(Container $container) { // before delete() method call this
+            $container->tasks()->delete();
+        });
     }
     
 }
