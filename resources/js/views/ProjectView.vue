@@ -52,6 +52,7 @@ const tool = ref()
 const dragCont = ref()
 const columnData = ref()
 const [token, setToken] = inject('token')
+console.log(token.value)
 const id = route.params.id
 const URL = inject('url')
 var cloneCol
@@ -80,6 +81,7 @@ const canSaveChange = ref(false)
 
 customCache(key, fetchData)
     .then((res) => {
+        console.log(res)
         isLoading.value = false
         project.value = res.project
         members.value = res.members
@@ -107,21 +109,11 @@ const handleAddTask = (formData) => {
             headers: { Authorization: `Bearer ${token.value.access_token}` }
         })
         .then((res) => {
+            console.log('task is added')
+            console.log(res.data)
             columnData.value[0].tasks.push(res.data.newTask)
             cloneCol[0].tasks.push(res.data.newTask)
             isLoading.value = false
-            // for (let index = 0; index < cloneCol[0].tasks.length; index++) {
-            //     if (!cloneCol[0].tasks[index].id) {
-            //         cloneCol[0].tasks[index] = res.data.newTask
-            //         break
-            //     }
-            // }
-            // for (let index = 0; index < columnData.value[0].tasks.length; index++) {
-            //     if (!columnData.value[0].tasks[index].id) {
-            //         columnData.value[0].tasks[index] = res.data.newTask
-            //         break
-            //     }
-            // }
         })
         .catch((err) => console.warn(err))
 }

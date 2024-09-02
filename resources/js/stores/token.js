@@ -10,12 +10,6 @@ if (!localToken) {
 
 const token = ref(localToken)
 
-export const headerConfig = {
-    headers: {
-        Authorization: `Bearer ${token.value.access_token}`
-    }
-}
-
 watch(
     () => token.value,
     (currValue) => {

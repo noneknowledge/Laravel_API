@@ -2,7 +2,6 @@
 import ConfirmDialog from './ConfirmDialog.vue'
 import { ref, inject } from 'vue'
 import axios from 'axios'
-import { headerConfig } from '../stores/'
 import { useRouter } from 'vue-router'
 
 const props = defineProps({
@@ -12,13 +11,18 @@ const props = defineProps({
 const clicked = ref(false)
 
 const URL = inject('url')
+const [token, setToken] = inject('token')
 
 const router = useRouter()
 
 const deleteBtn = () => {
     clicked.value = !clicked.value
     axios
-        .delete(`${URL}/project/${props.project.id}`, headerConfig)
+        .delete(`${URL}/project/${props.project.id}`, {
+            headers: {
+                Authorization: `Bearer ${token.value.access_token}`
+            }
+        })
         .then((res) => {
             router.push('/workspace')
         })

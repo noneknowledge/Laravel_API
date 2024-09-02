@@ -20,4 +20,9 @@ class Task extends Model
         'containerid',
         'arrange'
     ];
+
+    public function members(){
+        return $this->hasMany(TaskMember::class,'taskid');
+    }
+   
 }

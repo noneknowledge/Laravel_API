@@ -38,7 +38,7 @@ class ProjectController extends Controller
             array_push($projectMember,$pushItems);
         }
         
-        $data = Container::where("projectid",$id)->with("tasks")->get();
+        $data = Container::where("projectid",$id)->with("tasks.members")->get();
 
         return response()->json([
             'msg' => "Get request $id",
@@ -140,7 +140,8 @@ class ProjectController extends Controller
             foreach($req->members as $member){
                 UserProject::create([
                     'userid' => $member,
-                    'projectid' => $pid
+                    'projectid' => $pid,
+                    'role' => 'member'
                 ]);
             }
             return response()->json([
@@ -161,12 +162,11 @@ class ProjectController extends Controller
             $project = Project::find($pid);
             if ($project->leaderid === $user->id)
             {
-                $column = Container::where('projectid',$pid)->first();
-                $column->delete();
-                // $project->delete();
+                // $column = Container::where('projectid',$pid)->first();
+                $project->delete();
                 return response()->json([
                     'msg' => 'Deleted',
-                    'project' => $project
+                    'project' => $project,
                 ]);
             }
             else

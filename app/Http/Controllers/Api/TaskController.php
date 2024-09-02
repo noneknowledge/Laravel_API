@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Task;
+use App\Models\TaskMember;
 use App\Models\Project;
 use App\Models\Container;
 use App\Models\UserProject;
@@ -30,6 +31,12 @@ class TaskController extends Controller
                 'tag' => $req->tag,
                 'containerid' => $req->containerid
             ]);
+            foreach (explode(',',$req->members) as $member){
+                TaskMember::create([
+                    'taskid' => $newTask->id,
+                    'userid'=> $member
+                ]);
+            }
             return response()->json([
                 'formData' => $req->all(),
                 'newTask' =>$newTask

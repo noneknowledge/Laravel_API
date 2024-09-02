@@ -1,4 +1,4 @@
-import { useToken, headerConfig } from './token'
+import { useToken } from './token'
 import { customCache, clearKey } from './cache'
 
-export { useToken, customCache, clearKey, headerConfig }
+export { useToken, customCache, clearKey }

@@ -10,6 +10,7 @@ class TaskMember extends Model
     use HasFactory;
     protected $table="task_member";
     public $timestamps = false;
+    protected $fillable = ['userid', 'taskid','note'];
 
     public function member(){
         return $this->belongsTo(User::class,'leaderid','id');

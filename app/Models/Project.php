@@ -34,7 +34,13 @@ class Project extends Model
 
       // this is a recommended way to declare event handlers
       protected static function booted () {
-        static::deleting(function(Project $project) { // before delete() method call this
+        static::deleting(function(Project $project) { 
+            foreach($project->columns as $column){
+                foreach($column->tasks as $task){
+                    $task->members()->delete();
+                }
+                $column->tasks()->delete();
+            }
             $project->columns()->delete();
             $project->members()->delete();
         });

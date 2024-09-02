@@ -22,8 +22,14 @@ const addNewTask = (event) => {
     emits('addTask', formData)
 }
 
-const handleChildEvent = (value) => {
-    selectMember.value.push(value)
+const handleChildEvent = (ref) => {
+    console.log('member')
+    console.log(ref.id)
+    if (selectMember.value.includes(ref.id)) {
+        selectMember.value = selectMember.value.filter((member) => member != ref.id)
+    } else {
+        selectMember.value.push(ref.id)
+    }
 }
 </script>
 
